@@ -4,3 +4,11 @@ import Canvas from  './Canvas';
 import POIInstruction from  './POIInstruction';
 import SearchResults from './SearchResults';
 import KeywordSearch from './KeywordSearch';
+
+function Main() {
+    return (
+      <Canvas />
+    );
+  }
+  
+export default Main;
