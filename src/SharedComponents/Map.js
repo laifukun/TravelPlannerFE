@@ -4,7 +4,7 @@ import {GoogleMap, useLoadScript, Marker, InfoWindow,} from "@react-google-maps/
 const libraries = ["places"];
 const mapContainerStyle = {
     width: '100vw',
-    height: '100vh',
+    height: '87.2vh',
 };
 const options = {
     // styles: mapStyles,
