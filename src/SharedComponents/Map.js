@@ -1,5 +1,6 @@
 import React from "react";
 import {GoogleMap, useLoadScript, Marker, InfoWindow,} from "@react-google-maps/api";
+import * as POIData from "./POI-data-test.json";
 
 const libraries = ["places"];
 const mapContainerStyle = {
@@ -46,6 +47,15 @@ function Map() {
                 // onClick={onMapClick}
                 // onLoad={onMapLoad}
             >
+                {POIData.features.map(POI => (
+                    <Marker
+                        key = {POI.properties.PARK_ID}
+                        position = {{
+                            lat: POI.geometry.coordinates[1],
+                            lng: POI.geometry.coordinates[0]
+                        }}
+                    />
+                ))}
             </GoogleMap>
         </div>
     );
