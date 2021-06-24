@@ -8,27 +8,12 @@
       {
         "type": "Feature",
         "properties": {
-          "PARK_ID": 960,
-          "FACILITYID": 28014,
+          "poiid": 31,
           "NAME": "Empire State Building",
-          "NAME_FR": "Planchodrome Bearbrook",
           "ADDRESS": "West 34th Street, New York, NY",
-          "ADDRESS_FR": "8720, chemin Russell",
-          "FACILITY_T": "flat",
-          "FACILITY_1": "plat",
-          "ACCESSCTRL": "no/non",
-          "ACCESSIBLE": "no/non",
-          "OPEN": null,
-          "NOTES": "Outdoor",
-          "MODIFIED_D": "2018/01/18",
-          "CREATED_DA": null,
-          "FACILITY": "Neighbourhood : smaller size facility to service population of 10,000 or less",
-          "FACILITY_F": "De voisinage : petite installation assurant des services à 10 000 résidents ou moins.",
-          "DESCRIPTIO": "Flat asphalt surface, 5 components",
-          "DESCRIPT_1": "Surface d'asphalte plane, 5 modules",
-          "PICTURE_LI": null,
-          "PICTURE_DE": null,
-          "PICTURE__1": null
+          "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/c/c7/Empire_State_Building_from_the_Top_of_the_Rock.jpg",
+          "description": "World's tallest building from 1931 to 1972 and internationally recognized symbol of New York City",
+          "popularity": "5.64"
         },
         "geometry": {
           "type": "Point",
