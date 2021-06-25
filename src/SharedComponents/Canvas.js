@@ -1,5 +1,5 @@
 
-import '../styles/Canvas.css';
+//import '../styles/Canvas.css';
 import KeywordSearch from './KeywordSearch';
 import Map from './Map';
 

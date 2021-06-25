@@ -2,13 +2,11 @@ import React, { Component } from "react";
 import {Layout} from "antd";
 import Canvas from  "./Canvas";
 import POIInstruction from  './POIInstruction';
-import SearchResults from './SearchResults';
 import LoginForm from "../BeforeLogin/LoginForm";
 import { useState } from "react";
 import '../styles/Main.css';
 import KeywordSearch from './KeywordSearch';
 import Map from './Map';
-import SearchResult from './SearchResult';
 
 
 const { Content } = Layout;
@@ -36,7 +34,6 @@ function Main() {
                     <div className="site-drawer-render-in-current-wrapper">
                         {/* 这里填充components */}
                         <KeywordSearch />
-                        <SearchResult />
                         <Map />
                     </div>
                 </ Content>
