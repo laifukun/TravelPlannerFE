@@ -23,13 +23,14 @@ const SearchInput = ({onSearch}) => {
 }
 
 
-const KeywordSearch = ({searchKeyword}) => {
+const KeywordSearch = ({loadSearchResult}) => {
     const [loading, setLoading] = useState(false);
     const [results, setResults] = useState();
     const onSearch = (keyword) => {
         setLoading(true);
         searchByKeyword(keyword).then((data) => {
             setResults(data);  
+            loadSearchResult(data);
         }).catch((err) => message.error(err.message))
           .finally(() => {
             setLoading(false);

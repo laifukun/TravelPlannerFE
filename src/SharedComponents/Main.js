@@ -1,6 +1,5 @@
 import React, { Component } from "react";
 import {Layout} from "antd";
-import Canvas from  "./Canvas";
 import POIInstruction from  './POIInstruction';
 import LoginForm from "../BeforeLogin/LoginForm";
 import { useState } from "react";
@@ -13,7 +12,8 @@ const { Content } = Layout;
 
 function Main() {
     const [authed, setAuthed] = useState(false);
-    
+    const [searchResults, setSearchResults] = useState();
+
     return (
         <Layout style={{ height: "100vh" }}>
             {authed ? (
@@ -33,7 +33,7 @@ function Main() {
                     <LoginForm onSuccess={() => setAuthed(true)} />
                     <div className="site-drawer-render-in-current-wrapper">
                         {/* 这里填充components */}
-                        <KeywordSearch />
+                        <KeywordSearch loadSearchResult={(data)=>setSearchResults(data)}/>
                         <Map />
                     </div>
                 </ Content>
