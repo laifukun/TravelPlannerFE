@@ -2,31 +2,37 @@ import { useEffect, useState } from "react";
 import { Button, Drawer, List, message, Typography, Tooltip, Card} from "antd";
 import '../styles/SearchResult.css';
 
-function SearchResult({poiData}) {
+function SearchResult({searchData}) {
+    const [searchResultVisible, setSearchResultVisible] = useState(false);
     const [loading, setLoading] = useState(false);
+ 
+    const onCloseDrawer = () => {
+        setSearchResultVisible(false);
+    };
+     
+    const onOpenDrawer = () => {
+        setSearchResultVisible(true);
+    };
+    
+    useEffect(()=>{
+        searchData ? setSearchResultVisible(true):setSearchResultVisible(false);
+    })
+    
+
     return (
            <Drawer
-                onClose={console.log("close draw")}
-                visible={true}
-                width={400}
+                onClose={onCloseDrawer}
+                visible={searchResultVisible && searchData}
+                width={450}
                 placement='left'
                 style={{ position: 'absolute', paddingTop: '0px', paddingBottom: '0px', zIndex: '5' }}
                 getContainer={false}
             >
 
                 <List
-                    style={{ marginTop: 20 }}
+                    style={{ marginTop: 40 }}
                     loading={loading}
-                    grid={{
-                      gutter: 16,
-                      xs: 1,
-                      sm: 2,
-                      md: 4,
-                      lg: 4,
-                      xl: 3,
-                      xxl: 3,
-                    }}
-                    dataSource={poiData}
+                    dataSource={searchData}
                     renderItem={(item) => (
                       <List.Item>
                         <Card
@@ -37,7 +43,7 @@ function SearchResult({poiData}) {
                             alt={item.name}
                             style={{ height: 340, width: "100%", display: "block" }}
                           />
-                          //{`item.description`}
+                          {item.description}
                         </Card>
                       </List.Item>
                     )}
