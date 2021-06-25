@@ -10,6 +10,7 @@ const mapContainerStyle = {
 };
 
 const imageStyle = {
+    alt: "img",
     float: 'left',
     width: 100
 }
