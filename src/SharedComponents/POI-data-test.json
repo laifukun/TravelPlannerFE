@@ -1,0 +1,24 @@
+{
+    "type": "FeatureCollection",
+    "crs": {
+      "type": "name",
+      "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" }
+    },
+    "features": [
+      {
+        "type": "Feature",
+        "properties": {
+          "poiid": 31,
+          "NAME": "Empire State Building",
+          "ADDRESS": "West 34th Street, New York, NY",
+          "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/c/c7/Empire_State_Building_from_the_Top_of_the_Rock.jpg",
+          "description": "World's tallest building from 1931 to 1972 and internationally recognized symbol of New York City",
+          "popularity": "5.64"
+        },
+        "geometry": {
+          "type": "Point",
+          "coordinates": [-73.985664, 40.748440]
+        }
+      }
+    ]
+  }
