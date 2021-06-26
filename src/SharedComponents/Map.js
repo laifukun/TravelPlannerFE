@@ -28,13 +28,15 @@ const center = {
     lng: -73.985664,
 };
 
-function Map() {
+function Map({searchData}) {
     const[selectedPOI, setSelectedPOI] = useState(null);
 
     const {isLoaded, loadError} = useLoadScript({
         googleMapsApiKey: process.env.REACT_APP_GOOGLEMAP_API,
         libraries,
     });
+
+    const data = searchData ? searchData : [];
 
     const mapRef = React.useRef();
     const onMapLoad = React.useCallback((map) => {
@@ -60,12 +62,12 @@ function Map() {
                 // onClick={onMapClick}
                 // onLoad={onMapLoad}
             >
-                {POIData.features.map(POI => (
+                {data.map(POI => (
                     <Marker
-                        key = {POI.properties.poiid}
+                        key = {POI.poiId}
                         position = {{
-                            lat: POI.geometry.coordinates[1],
-                            lng: POI.geometry.coordinates[0]
+                            lat: POI.lat,
+                            lng: POI.lng
                         }}
                         onClick = {() => {
                             setSelectedPOI(POI);
@@ -80,8 +82,8 @@ function Map() {
                 {selectedPOI && (
                     <InfoWindow
                         position = {{
-                            lat: selectedPOI.geometry.coordinates[1],
-                            lng: selectedPOI.geometry.coordinates[0]
+                            lat: selectedPOI.lat,
+                            lng: selectedPOI.lng
                         }}
                         onCloseClick = {() => {
                             setSelectedPOI(null);
@@ -90,16 +92,14 @@ function Map() {
                         <div>
                             <div >
                                 <img 
-                                    src={selectedPOI.properties.imageUrl}
+                                    src={selectedPOI.imageUrl}
                                     style = {imageStyle}
                                 />
                             </div>
                             <div >
-                                <b>{selectedPOI.properties.NAME}</b>
+                                <b>{selectedPOI.name}</b>
                                 <br/>
-                                Address: {selectedPOI.properties.ADDRESS}
-                                <br/>
-                                Description: {selectedPOI.properties.description}
+                                Description: {selectedPOI.description}
                             </div>
                         </div>
                     </InfoWindow>

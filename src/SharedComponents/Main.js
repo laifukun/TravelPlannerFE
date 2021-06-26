@@ -34,7 +34,7 @@ function Main() {
                     <div className="site-drawer-render-in-current-wrapper">
                         {/* 这里填充components */}
                         <KeywordSearch loadSearchResult={(data)=>setSearchResults(data)}/>
-                        <Map />
+                        <Map searchData = {searchResults}/>
                     </div>
                 </ Content>
             )}
