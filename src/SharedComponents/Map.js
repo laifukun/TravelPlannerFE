@@ -5,6 +5,9 @@ import mapStyles from "../styles/mapStyles";
 
 const libraries = ["places"];
 const mapContainerStyle = {
+    // overflow: "hidden !important" ,
+    // lineHeight: 1.35,
+    // whiteSpace: "nowrap",
     width: '100vw',
     height: '87.2vh',
 };
