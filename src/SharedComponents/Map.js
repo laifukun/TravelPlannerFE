@@ -3,6 +3,8 @@ import { GoogleMap, useLoadScript, Marker, InfoWindow, DirectionsService, Direct
 import * as POIData from "./POI-data-test.json";
 import mapStyles from "../styles/mapStyles";
 import PropTypes from 'prop-types'
+import {retrieveRoute} from '../Utils/routeUtils';
+import {message} from 'antd';
 
 const libraries = ["places"];
 const mapContainerStyle = {
@@ -58,9 +60,13 @@ function Map() {
     const [origin, setOrigin] = React.useState('')
     const [destination, setDestination] = React.useState('')
     const [waypoints, setWaypoints] = React.useState([])
+
     const originRef = React.useRef()
     const destinationRef = React.useRef()
     const waypointsRef = React.useRef()
+
+    const [retrieveID, setRetrieveID] = React.useState(null)
+    const retrieveRef = React.useRef(0)
 
     const directionsCallback = React.useCallback((res) => {
         console.log(res)
@@ -101,13 +107,25 @@ function Map() {
         }
     }, [])
 
+    const onRetrieveRoute = React.useCallback(() => {
+        if (retrieveRef.current.value !== 0) {
+            setRetrieveID(retrieveRef.current.value)
+
+            retrieveRoute(retrieveRef.current.value).then((data) => {
+                setOrigin(data.startAddress);
+                setDestination(data.endAddress);
+                console.log('onClick args: ', data.PoiLIST)
+            }).catch((err) => message.error(err.message));
+        }
+    }, [])
+
     const onMapClick = React.useCallback((...args) => {
         console.log('onClick args: ', args)
     }, [])
 
     let directionsServiceOptions = {
-        destination: destination,
         origin: origin,
+        destination: destination,
         waypoints: waypoints,
         travelMode: travelMode,
         optimizeWaypoints: true,
@@ -227,6 +245,25 @@ function Map() {
                 <button className='btn btn-primary' type='button' onClick={onClick}>
                     Build Route
                 </button>
+
+                <div>
+                    <div className='col-md-6 col-lg-4'>
+                        <div className='form-group'>
+                            <label htmlFor='RETRIEVE'>Retrieve saved routes by ID</label>
+                            <br />
+                            <input
+                                id='RetrieveID'
+                                className='form-control'
+                                type='number'
+                                ref={retrieveRef}
+                            />
+                        </div>
+                    </div>
+
+                    <button className='btn btn-retrieve' type='button' onClick={onRetrieveRoute}>
+                        Retrive Route
+                    </button>
+                </div>
 
             </div>
 
