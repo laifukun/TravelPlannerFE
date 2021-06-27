@@ -69,8 +69,6 @@ function Map() {
     const retrieveRef = React.useRef(0)
 
     const directionsCallback = React.useCallback((res) => {
-        console.log(res)
-
         if (res !== null) {
             if (res.status === 'OK') {
                 setResponse(res)
@@ -114,7 +112,19 @@ function Map() {
             retrieveRoute(retrieveRef.current.value).then((data) => {
                 setOrigin(data.startAddress);
                 setDestination(data.endAddress);
-                console.log('onClick args: ', data.PoiLIST)
+
+                let waypts = [];
+                for (let i = 0; i < data.poiList.length; i++) {
+                    waypts.push({
+                    location: {
+                        lat : data.poiList[i].lat, 
+                        lng : data.poiList[i].lng
+                    },
+                    stopover: true,
+                    });
+                  }
+
+                setWaypoints(waypts)
             }).catch((err) => message.error(err.message));
         }
     }, [])
@@ -338,5 +348,4 @@ function Map() {
 }
 
 Map.propTypes = DirectionsPropTypes
-// export default React.memo(Map)
 export default Map
