@@ -57,8 +57,10 @@ function Map() {
     const [travelMode, setTravelMode] = React.useState('DRIVING')
     const [origin, setOrigin] = React.useState('')
     const [destination, setDestination] = React.useState('')
+    const [waypoints, setWaypoints] = React.useState([])
     const originRef = React.useRef()
     const destinationRef = React.useRef()
+    const waypointsRef = React.useRef()
 
     const directionsCallback = React.useCallback((res) => {
         console.log(res)
@@ -92,9 +94,11 @@ function Map() {
         if (originRef.current.value !== '' && destinationRef.current.value !== '') {
             setOrigin(originRef.current.value)
             setDestination(destinationRef.current.value)
-            console.log('click on Build Route 01')
+            setWaypoints([{
+                location: waypointsRef.current.value,
+                stopover: true,
+            }])
         }
-        console.log('click on Build Route 02')
     }, [])
 
     const onMapClick = React.useCallback((...args) => {
@@ -104,7 +108,9 @@ function Map() {
     let directionsServiceOptions = {
         destination: destination,
         origin: origin,
+        waypoints: waypoints,
         travelMode: travelMode,
+        optimizeWaypoints: true,
     }
 
     let directionsRendererOptions = {
@@ -142,6 +148,19 @@ function Map() {
                                 className='form-control'
                                 type='text'
                                 ref={destinationRef}
+                            />
+                        </div>
+                    </div>
+
+                    <div className='col-md-6 col-lg-4'>
+                        <div className='form-group'>
+                            <label htmlFor='WAYPOINTS'>Waypoints</label>
+                            <br />
+                            <input
+                                id='WAYPOINTS'
+                                className='form-control'
+                                type='text'
+                                ref={waypointsRef}
                             />
                         </div>
                     </div>
