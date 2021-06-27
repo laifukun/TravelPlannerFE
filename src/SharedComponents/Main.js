@@ -1,18 +1,25 @@
 import React, { Component } from "react";
-import {Layout} from "antd";
+import {Layout, Button} from "antd";
 import POIInstruction from  './POIInstruction';
 import LoginForm from "../BeforeLogin/LoginForm";
+import RegisterForm from "../BeforeLogin/RegisterForm";
 import { useState } from "react";
 import '../styles/Main.css';
 import KeywordSearch from './KeywordSearch';
 import Map from './Map';
+import {HashRouter as Router , Route , Switch} from 'react-router-dom'
+import { createBrowserHistory } from "history";
+import LoginButtonWithRouter from "../BeforeLogin/LoginButton"
+import RegisterButtonWithRouter from "../BeforeLogin/RegisterButton"
+
 
 
 const { Content } = Layout;
 
-function Main() {
+function Main(props) {
     const [authed, setAuthed] = useState(false);
     const [searchResults, setSearchResults] = useState();
+
 
     return (
         <Layout style={{ height: "100vh" }}>
@@ -30,7 +37,13 @@ function Main() {
                     maxHeight: "calc(100% - 64px)",
                     overflowY: "auto",
                 }}> 
-                    <LoginForm onSuccess={() => setAuthed(true)} />
+                    <Router history={createBrowserHistory()}>
+                        <Route path="/Login" render={(props) => (<LoginForm {...props} onSuccess={() => setAuthed(true)} />)} />                                             
+                        <LoginButtonWithRouter></LoginButtonWithRouter>
+                        <Route path="/Register" render={(props) => (<RegisterForm {...props} onSuccess={() => <LoginForm onSuccess = { () => setAuthed(true) }/>} />)} />                                             
+                        <RegisterButtonWithRouter></RegisterButtonWithRouter>
+                    </Router>
+                    
                     <div className="site-drawer-render-in-current-wrapper">
                         {/* 这里填充components */}
                         <KeywordSearch loadSearchResult={(data)=>setSearchResults(data)}/>
