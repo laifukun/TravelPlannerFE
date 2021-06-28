@@ -1,55 +1,75 @@
-import { Button, Form, Input, message } from "antd";
+import { Button, Form, Input, message, Modal } from "antd";
 import React, {useState} from "react";
 import { LockOutlined, UserOutlined } from "@ant-design/icons";
-import { login } from "../utils";
- 
-function LoginForm(props) {
+import { login } from "../Utils/userUtils";
+
+function LoginForm({onLoginSuccess}) {
     const [loading, setLoading] = useState(false);
- 
-    function onFinish(data) {
+    const [visible, setVisible] = useState(false);
+
+    const onFinish = (data) => {
         setLoading(true);
+        onLogin(data);
+    }
+  
+    const onLogin = (data) => {
         login(data)
         .then(() => {
             message.success(`Login Successful`);
-            props.onSuccess();
+            onLoginSuccess(data.username)
         })
         .catch((err) => {
             message.error(err.message);
         })
         .finally(() => {
             setLoading(false);
+            setVisible(false);
         });
     };
- 
-  
-    return (
-        <Form
-        name="normal_login"
-        onFinish={onFinish}
-        style={{
-            width: 300,
-            margin: "auto",
-        }}
-        >
-        <Form.Item
-            name="username"
-            rules={[{ required: true, message: "Please input your Username!" }]}
-        >
-            <Input prefix={<UserOutlined />} placeholder="Username" />
-        </Form.Item>
-        <Form.Item
-            name="password"
-            rules={[{ required: true, message: "Please input your Password!" }]}
-        >
-            <Input.Password prefix={<LockOutlined />} placeholder="Password" />
-        </Form.Item>
 
-        <Form.Item>
-            <Button type="primary" htmlType="submit" loading={loading}>
+    const onCancel =() => {
+        setVisible(false);
+    }
+
+    return (
+        <>
+        <Button type="primary" htmlType="submit" onClick={()=>setVisible(true)}>
             Login
-            </Button>
-        </Form.Item>
-        </Form>
+        </Button>
+        <Modal 
+        visible={visible}
+        onCancel={onCancel}
+        footer={[
+            <Form
+            name="normal_login"
+            onFinish={onFinish}
+            style={{
+                width: 300,
+                margin: "auto",
+            }}
+            >
+            <Form.Item
+                name="username"
+                rules={[{ required: true, message: "Please input your Username!" }]}
+            >
+                <Input prefix={<UserOutlined />} placeholder="Username" />
+            </Form.Item>
+            <Form.Item
+                name="password"
+                rules={[{ required: true, message: "Please input your Password!" }]}
+            >
+                <Input.Password prefix={<LockOutlined />} placeholder="Password" />
+            </Form.Item>
+
+            <Form.Item>
+                <Button type="primary" htmlType="submit" loading={loading}>
+                Login
+                </Button>
+            </Form.Item>
+            </Form>,]}
+        >
+        </Modal>
+        </>
     );
   
 }

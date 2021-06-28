@@ -2,27 +2,23 @@ import { useEffect, useState } from "react";
 import { Button, Drawer, List, message, Typography, Tooltip, Card} from "antd";
 import '../styles/SearchResult.css';
 
-function SearchResult({searchData}) {
-    const [searchResultVisible, setSearchResultVisible] = useState(false);
+function SearchResult({searchData, visible, onClose}) {
+    //const [resultVisible, setResultVisible] = useState(false);
     const [loading, setLoading] = useState(false);
  
     const onCloseDrawer = () => {
-        setSearchResultVisible(false);
+      onClose();
     };
-     
+   
+    /*
     const onOpenDrawer = () => {
-        setSearchResultVisible(true);
+      setResultVisible(true);
     };
-    
-    useEffect(()=>{
-        searchData ? setSearchResultVisible(true):setSearchResultVisible(false);
-    })
-    
-
+    */
     return (
            <Drawer
                 onClose={onCloseDrawer}
-                visible={searchResultVisible && searchData}
+                visible={visible }
                 width={450}
                 placement='left'
                 style={{ position: 'absolute', paddingTop: '0px', paddingBottom: '0px', zIndex: '5' }}

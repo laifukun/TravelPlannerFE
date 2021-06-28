@@ -25,7 +25,7 @@ const options = {
     zoomControl: true,
 };
 const center = {
-    lat: 40.748440,
+    lat: 41.748440,
     lng: -73.985664,
 };
 
@@ -35,7 +35,7 @@ const DirectionsPropTypes = {
     }).isRequired,
 }
 
-function Map( {styles} ) {
+function Map() {
     const [selectedPOI, setSelectedPOI] = useState(null);
 
     const { isLoaded, loadError } = useLoadScript({
@@ -101,19 +101,18 @@ function Map( {styles} ) {
         console.log('onClick args: ', args)
     }, [])
 
-    const directionsServiceOptions = React.useMemo(() => {
-        return {
+    let directionsServiceOptions = {
+ 
             destination: destination,
             origin: origin,
             travelMode: travelMode,
         }
-    }, [])
 
-    const directionsRendererOptions = React.useMemo(() => {
-        return {
+
+    let directionsRendererOptions =  {
             directions: response,
         }
-    }, [])
+ 
 
     if (loadError) return "Error";
     if (!isLoaded) return "Loading...";
