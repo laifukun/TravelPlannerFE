@@ -1,4 +1,4 @@
-import React, {useEffect, useState,   Fragment} from "react";
+import React, {useEffect, useState} from "react";
 import {GoogleMap, useLoadScript, Marker, InfoWindow,} from "@react-google-maps/api";
 import mapStyles from "../styles/mapStyles";
 import {searchByRange} from '../Utils/searchUtils';
@@ -19,23 +19,19 @@ const imageStyle = {
     width: 100
 }
 
-// const textStyle = {
-//     textalign: 'left'
-// }
 const options = {
     styles: mapStyles,
     disableDefaultUI: true,
     zoomControl: true,
 };
-// const center = {
-//     lat: 40.748440,
-//     lng: -73.985664,
-// };
+const center = {
+    lat: 40.748440,
+    lng: -73.985664,
+};
 
 
-function Map({searchData, center}) {
+function Map({searchData}) {
     const[selectedPOI, setSelectedPOI] = useState(null);
-    // const[center, setCenter] = useState({ lat: 40.748440, lng: -73.985664 });
     const [position, setPosition] = useState({
         lat: 40.748440,
         lng: -73.985664
