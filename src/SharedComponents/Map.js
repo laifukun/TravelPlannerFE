@@ -1,7 +1,8 @@
-import React, {useState} from "react";
+import React, {useEffect, useState,   Fragment} from "react";
 import {GoogleMap, useLoadScript, Marker, InfoWindow,} from "@react-google-maps/api";
-import * as POIData from "./POI-data-test.json";
 import mapStyles from "../styles/mapStyles";
+import {searchByRange} from '../Utils/searchUtils';
+import { message } from "antd";
 
 const libraries = ["places"];
 const mapContainerStyle = {
@@ -26,30 +27,67 @@ const options = {
     disableDefaultUI: true,
     zoomControl: true,
 };
-const center = {
-    lat: 40.748440,
-    lng: -73.985664,
-};
+// const center = {
+//     lat: 40.748440,
+//     lng: -73.985664,
+// };
 
-function Map({searchData}) {
+
+function Map({searchData, center}) {
     const[selectedPOI, setSelectedPOI] = useState(null);
+    // const[center, setCenter] = useState({ lat: 40.748440, lng: -73.985664 });
+    const [position, setPosition] = useState({
+        lat: 40.748440,
+        lng: -73.985664
+      });
 
     const {isLoaded, loadError} = useLoadScript({
         googleMapsApiKey: process.env.REACT_APP_GOOGLEMAP_API,
         libraries,
     });
 
-    const data = searchData ? searchData : [];
+    function handleLoad(map) {
+        mapRef.current = map;
+      }
+    
+      function handleCenterChanged() {
+        if (!mapRef.current) return;
+        const newPos = mapRef.current.getCenter().toJSON();
+        setPosition(newPos);
+        console.log(newPos)
+      }
+
+    const [RangeData, setRangeData] = useState([]);
+    const [loading, setLoading] = useState(false);
+
+    useEffect(() => {
+        setLoading(true);
+        searchByRange(position.lat, position.lng)
+            .then((data) => {
+                setRangeData(data);
+            })
+            .catch((err) => {
+                message.error(err.message);
+            })
+            .finally(() => {
+                setLoading(false);
+            });
+    });
+
+
+    const POIdata = searchData ? searchData : RangeData;
+
+   
 
     const mapRef = React.useRef();
     const onMapLoad = React.useCallback((map) => {
         mapRef.current = map;
     }, [])
 
-    const panTo = React.useCallback(({lat, lng}) => {
-        mapRef.current.panTo({lat, lng});
-        mapRef.current.setZoom(14);
-    }, [])
+    // const panTo = React.useCallback(({lat, lng}) => {
+    //     mapRef.current.panTo({lat, lng});
+    //     mapRef.current.setZoom(14);
+    // }, [])
     
     if (loadError) return "Error";
     if (!isLoaded) return "Loading...";
@@ -58,14 +96,19 @@ function Map({searchData}) {
         <div>
             <GoogleMap
                 // id="map"
+                // onLoad={map => setMapRef(map)}
+                onLoad={handleLoad}
                 mapContainerStyle={mapContainerStyle}
-                zoom={10}
+                onCenterChanged={handleCenterChanged}
+                zoom={13}
                 center={center}
                 options={options}
+                
                 // onClick={onMapClick}
-                // onLoad={onMapLoad}
+                onLoad={onMapLoad}
             >
-                {data.map(POI => (
+                
+                {POIdata.map(POI => (
                     <Marker
                         key = {POI.poiId}
                         position = {{
@@ -82,6 +125,9 @@ function Map({searchData}) {
                     />
                 ))}
 
+                <h3>
+                Center {center.lat}, {center.lng}
+                </h3>
                 {selectedPOI && (
                     <InfoWindow
                         position = {{
@@ -104,6 +150,9 @@ function Map({searchData}) {
                                 <br/>
                                 Description: {selectedPOI.description}
                             </div>
+                            <button type="button">
+                                Show details
+                            </button>
                         </div>
                     </InfoWindow>
                 )}
