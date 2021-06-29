@@ -17,18 +17,17 @@ const { Header, Content, Footer} = Layout;
 function Main(props) {
     const [authed, setAuthed] = useState(false);
     const [searchResults, setSearchResults] = useState();
+    const [pickedPOI, setPickedPOI] = useState();
     const [user, setUser] =useState();
 
-    const onLoginSuccess = (username) => {
-        
+    const onLoginSuccess = (username) => {        
         getUserInfo(username).then((data)=> {
             setUser(data);
         }).catch((err) => {
             message.error(err.message);
         }).finally(()=>{
             setAuthed(true);
-        });
-        
+        });        
      }
     
     const onRegisterSuccess = () =>{}
@@ -39,12 +38,12 @@ function Main(props) {
     return (
         <Layout style={{ height: "80vh" }}>
 
-        <Header>
+        <Header style={{paddingLeft: 0, paddingRight: 0}}>
             <div className="header">
                 <div className="title">
                 Travel Planner
                 </div>
-                <div >
+                <>
                     {authed ? ( <div className="welcome"> 
                                     <div>Welcome <strong> {`${user.firstName}`} </strong> ! </div> 
                                     <Logout onLogoutSuccess={onLogoutSuccess} /> 
@@ -54,7 +53,7 @@ function Main(props) {
                     <RegisterForm onSuccess={onRegisterSuccess} />
                     </div>
                     )}
-                </div>
+                </>
             </div>
       </Header>
 
@@ -62,8 +61,10 @@ function Main(props) {
     
         <div className="site-drawer-render-in-current-wrapper">
                         {/* 这里填充components */}
-            <KeywordSearch loadSearchResult={(data)=>setSearchResults(data)}/>
-            <Map searchData = {searchResults}/>
+            <KeywordSearch 
+            loadSearchResult={(data)=>setSearchResults(data)} 
+            loadSelectedPOI={ (item)=>setPickedPOI(item) }/>
+            <Map searchData = {searchResults} pickedPOI={pickedPOI}/>
             
         </div>
     </ Content>

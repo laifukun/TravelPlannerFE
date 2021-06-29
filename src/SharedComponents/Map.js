@@ -4,7 +4,8 @@ import * as POIData from "./POI-data-test.json";
 import mapStyles from "../styles/mapStyles";
 import PropTypes from 'prop-types'
 import {searchByRange} from '../Utils/searchUtils';
-import { Button, message } from "antd";
+import "../styles/Map.css"
+import { Button, Image, Card } from "antd";
 
 
 const libraries = ["places"];
@@ -16,31 +17,28 @@ const mapContainerStyle = {
     height: '87.2vh',
 };
 
-const imageStyle = {
-    alt: "img",
-    float: 'left',
-    width: 100
-}
+
 
 const options = {
     styles: mapStyles,
     disableDefaultUI: true,
     zoomControl: true,
 };
+/*
 const center = {
     lat: 41.748440,
     lng: -73.985664,
 };
-
+*/
 const DirectionsPropTypes = {
     styles: PropTypes.shape({
         container: PropTypes.object.isRequired,
     }).isRequired,
 }
 
-function Map({searchData}) {
+function Map({searchData, pickedPOI}) {
     const[selectedPOI, setSelectedPOI] = useState(null);
-    const [position, setPosition] = useState({
+    const [center, setCenter] = useState({
         lat: 40.748440,
         lng: -73.985664
       });
@@ -57,18 +55,26 @@ function Map({searchData}) {
         mapRef.current = map;
       }
     
-      function handleCenterChanged() {
+    function handleCenterChanged() {
         if (!mapRef.current) return;
         const newPos = mapRef.current.getCenter().toJSON();
-        setPosition(newPos);
+        //setCenter(newPos);
         console.log(newPos)
-      }
+    }
 
-    
-
+    const onSelectPOI = (poi)=> {
+        setSelectedPOI(poi);
+        setCenter({lat: poi.lat, lng: poi.lng});
+    }
+    useEffect(()=>{
+        if (pickedPOI) {
+            onSelectPOI(pickedPOI);
+        }
+    }, [pickedPOI])
+/*
     useEffect(() => {
         setLoading(true);
-        searchByRange(position.lat, position.lng, 500)
+        searchByRange(center.lat, center.lng, 500)
             .then((data) => {
                 setRangeData(data);
             })
@@ -79,7 +85,7 @@ function Map({searchData}) {
                 setLoading(false);
             });
     });
-
+*/
 
     const POIdata = searchData ? searchData : RangeData;
 
@@ -153,8 +159,8 @@ function Map({searchData}) {
         directions: response,
     }
 
-    const onSelectPOI = ()=>{
-        console.log("POISelected");
+    const onAddPOItoRoute = (poi)=>{
+        console.log("onAddPOItoRoute");
     }
     if (loadError) return "Error";
     if (!isLoaded) return "Loading...";
@@ -278,11 +284,11 @@ function Map({searchData}) {
                             lng: POI.lng
                         }}
                         onClick={() => {
-                            setSelectedPOI(POI);
+                            onSelectPOI(POI);
                         }}
                         icon = {{
                             url: POI.imageUrl,
-                            scaledSize: new window.google.maps.Size(40, 40)
+                            scaledSize: new window.google.maps.Size(50, 50)
                         }}
                     />
                 ))}
@@ -300,21 +306,20 @@ function Map({searchData}) {
                             setSelectedPOI(null);
                         }}
                     >
-                        <div>
-                            <div >
-                                <img 
-                                    src={selectedPOI.imageUrl}
-                                    style = {imageStyle}
-                                />
-                            </div>
-                            <div >
-                                <b>{selectedPOI.name}</b>
-                                <br/>
-                                Description: {selectedPOI.description}
-                            </div>
-                            <Button type="primary" htmlType="submit" onClick={onSelectPOI}>
-                                Show details
+                        <div className="info-window">
+                            <Image 
+                                    src={selectedPOI.imageUrl}                                    
+                                    alt={selectedPOI.name}
+                                    className="info-image"
+                             />
+                             <div className="card-button">
+                             <Card title ={selectedPOI.name} bodyStyle={{paddingTop: 0, paddingBottom: 0}}>
+                                {selectedPOI.description}                                
+                             </Card>
+                             <Button type="primary" htmlType="submit" onClick={()=>onAddPOItoRoute(selectedPOI)}>
+                                Add to Trip
                             </Button>
+                             </div>
                         </div>
                     </InfoWindow>
                 )}
