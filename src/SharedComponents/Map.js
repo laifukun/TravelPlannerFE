@@ -114,10 +114,10 @@ function Map({searchData}) {
                         onClick = {() => {
                             setSelectedPOI(POI);
                         }}
-                        // icon = {{
-                        //     url: " ",
-                        //     scaledSize: new window.google.maps.Size(25, 25)
-                        // }}
+                        icon = {{
+                            url: POI.imageUrl,
+                            scaledSize: new window.google.maps.Size(40, 40)
+                        }}
                     />
                 ))}
 
