@@ -40,3 +40,19 @@ export const login = (credential) => {
       return response.json();
     });
   }; 
+
+  export const logout = () => {
+    const loginUrl = `/users/logout`;
+   
+    return fetch(loginUrl, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+
+      },
+    }).then((response) => {
+      if (response.status !== 200) {
+        throw Error("Fail to log out");
+      }
+    });
+  };

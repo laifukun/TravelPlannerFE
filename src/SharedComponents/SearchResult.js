@@ -9,12 +9,7 @@ function SearchResult({searchData, visible, onClose}) {
     const onCloseDrawer = () => {
       onClose();
     };
-   
-    /*
-    const onOpenDrawer = () => {
-      setResultVisible(true);
-    };
-    */
+
     return (
            <Drawer
                 onClose={onCloseDrawer}

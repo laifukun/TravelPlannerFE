@@ -4,7 +4,8 @@ import * as POIData from "./POI-data-test.json";
 import mapStyles from "../styles/mapStyles";
 import PropTypes from 'prop-types'
 import {searchByRange} from '../Utils/searchUtils';
-import { message } from "antd";
+import { Button, message } from "antd";
+
 
 const libraries = ["places"];
 const mapContainerStyle = {
@@ -152,6 +153,9 @@ function Map({searchData}) {
         directions: response,
     }
 
+    const onSelectPOI = ()=>{
+        console.log("POISelected");
+    }
     if (loadError) return "Error";
     if (!isLoaded) return "Loading...";
 
@@ -276,10 +280,10 @@ function Map({searchData}) {
                         onClick={() => {
                             setSelectedPOI(POI);
                         }}
-                    // icon = {{
-                    //     url: " ",
-                    //     scaledSize: new window.google.maps.Size(25, 25)
-                    // }}
+                        icon = {{
+                            url: POI.imageUrl,
+                            scaledSize: new window.google.maps.Size(40, 40)
+                        }}
                     />
                 ))}
 
@@ -308,9 +312,9 @@ function Map({searchData}) {
                                 <br/>
                                 Description: {selectedPOI.description}
                             </div>
-                            <button type="button">
+                            <Button type="primary" htmlType="submit" onClick={onSelectPOI}>
                                 Show details
-                            </button>
+                            </Button>
                         </div>
                     </InfoWindow>
                 )}

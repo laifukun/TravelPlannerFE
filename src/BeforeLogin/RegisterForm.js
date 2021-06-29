@@ -1,7 +1,7 @@
 import { Button, Form, Input, message, Modal } from "antd";
 import { useState } from "react";
 import { LockOutlined, UserOutlined } from "@ant-design/icons";
-import { login, register } from "../Utils/userUtils";
+import { register } from "../Utils/userUtils";
 
 const RegistrationForm = ({onSuccess}) => {
     const [loading, setLoading] = useState(false);

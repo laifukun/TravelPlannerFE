@@ -3,6 +3,7 @@ import {Layout, Button, message} from "antd";
 import POIInstruction from  './POIInstruction';
 import LoginForm from "../BeforeLogin/LoginForm";
 import RegisterForm from "../BeforeLogin/RegisterForm";
+import Logout from "../AfterLogin/LogOut"
 import { useState } from "react";
 import '../styles/Main.css';
 import KeywordSearch from './KeywordSearch';
@@ -31,6 +32,9 @@ function Main(props) {
      }
     
     const onRegisterSuccess = () =>{}
+    const onLogoutSuccess = ()=> {
+        setAuthed(false);
+    }
 
     return (
         <Layout style={{ height: "80vh" }}>
@@ -41,7 +45,10 @@ function Main(props) {
                 Travel Planner
                 </div>
                 <div >
-                    {authed ? ( <p className="welcome"> Welcome <strong> {`${user.firstName}`} </strong> ! </p> ) : (
+                    {authed ? ( <div className="welcome"> 
+                                    <div>Welcome <strong> {`${user.firstName}`} </strong> ! </div> 
+                                    <Logout onLogoutSuccess={onLogoutSuccess} /> 
+                                </div> ) : (
                     <div className="login-button">
                     <LoginForm onLoginSuccess={onLoginSuccess} />
                     <RegisterForm onSuccess={onRegisterSuccess} />
@@ -56,7 +63,7 @@ function Main(props) {
         <div className="site-drawer-render-in-current-wrapper">
                         {/* 这里填充components */}
             <KeywordSearch loadSearchResult={(data)=>setSearchResults(data)}/>
-            <Map />
+            <Map searchData = {searchResults}/>
             
         </div>
     </ Content>
