@@ -141,17 +141,14 @@ function Map({searchData}) {
     }, [])
 
     let directionsServiceOptions = {
- 
-            destination: destination,
-            origin: origin,
-            travelMode: travelMode,
-        }
+        destination: destination,
+        origin: origin,
+        travelMode: travelMode,
+    }
 
-
-    let directionsRendererOptions =  {
-            directions: response,
-        }
- 
+    let directionsRendererOptions = {
+        directions: response,
+    }
 
     if (loadError) return "Error";
     if (!isLoaded) return "Loading...";
@@ -333,4 +330,5 @@ function Map({searchData}) {
 }
 
 Map.propTypes = DirectionsPropTypes
+// export default React.memo(Map)
 export default Map
