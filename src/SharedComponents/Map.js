@@ -44,6 +44,9 @@ function Map({searchData}) {
         lng: -73.985664
       });
 
+    const [RangeData, setRangeData] = useState([]);
+    const [loading, setLoading] = useState(false);
+
     const { isLoaded, loadError } = useLoadScript({
         googleMapsApiKey: process.env.REACT_APP_GOOGLEMAP_API,
         libraries,
@@ -60,8 +63,7 @@ function Map({searchData}) {
         console.log(newPos)
       }
 
-    const [RangeData, setRangeData] = useState([]);
-    const [loading, setLoading] = useState(false);
+    
 
     useEffect(() => {
         setLoading(true);
