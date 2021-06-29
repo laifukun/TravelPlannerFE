@@ -29,7 +29,10 @@
   margin-bottom: 0px;
 }
 .login-button {
+ width: 200px;
  margin-right: 100px;
+ display: flex;
+ justify-content: space-between;
 }
 
 .footer {
@@ -42,4 +45,11 @@
   background-color:#282c34;
   text-align: center;
   color: white;
+}
+
+.welcome {
+  color: white;
+  font-size: 18px;
+  font-weight: bold;
+  margin-right: 100px;
 }

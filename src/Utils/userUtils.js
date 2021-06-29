@@ -5,9 +5,9 @@ export const login = (credential) => {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+
       },
       credentials: "include",
-      mode: 'no-cors',
     }).then((response) => {
       if (response.status !== 200) {
         throw Error("Fail to log in");

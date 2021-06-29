@@ -1,7 +1,7 @@
 import { Button, Form, Input, message, Modal } from "antd";
 import React, {useState} from "react";
 import { LockOutlined, UserOutlined } from "@ant-design/icons";
-import { login } from "../Utils/userUtils";
+import { login, register } from "../Utils/userUtils";
 
 function LoginForm({onLoginSuccess}) {
     const [loading, setLoading] = useState(false);
@@ -15,7 +15,9 @@ function LoginForm({onLoginSuccess}) {
     const onLogin = (data) => {
         login(data)
         .then(() => {
+
             message.success(`Login Successful`);
+
             onLoginSuccess(data.username)
         })
         .catch((err) => {

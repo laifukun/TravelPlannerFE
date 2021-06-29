@@ -2,44 +2,51 @@ import React, { Component } from "react";
 import {Layout, Button, message} from "antd";
 import POIInstruction from  './POIInstruction';
 import LoginForm from "../BeforeLogin/LoginForm";
+import RegisterForm from "../BeforeLogin/RegisterForm";
 import { useState } from "react";
 import '../styles/Main.css';
 import KeywordSearch from './KeywordSearch';
 import Map from './Map';
+import { getUserInfo } from "../Utils/userUtils";
+
 
 
 const { Header, Content, Footer} = Layout;
 
-function Main() {
+function Main(props) {
     const [authed, setAuthed] = useState(false);
     const [searchResults, setSearchResults] = useState();
-    const [userFirstName, setUserFirstName] =useState();
-    const [loginForm, setLoginForm] = useState(false);
-    const [registrationForm, setRegistrationForm] = useState(false);
+    const [user, setUser] =useState();
 
     const onLoginSuccess = (username) => {
-        setUserFirstName(username);
-        setLoginForm(false);
-    }
+        
+        getUserInfo(username).then((data)=> {
+            setUser(data);
+        }).catch((err) => {
+            message.error(err.message);
+        }).finally(()=>{
+            setAuthed(true);
+        });
+        
+     }
     
+    const onRegisterSuccess = () =>{}
 
     return (
         <Layout style={{ height: "80vh" }}>
 
         <Header>
             <div className="header">
-                <p className="title">
+                <div className="title">
                 Travel Planner
-                </p>
-                <div className="login-button">
-                {authed ? ( "Welcome " + {userFirstName} ) : (
-                    <>
+                </div>
+                <div >
+                    {authed ? ( <p className="welcome"> Welcome <strong> {`${user.firstName}`} </strong> ! </p> ) : (
+                    <div className="login-button">
                     <LoginForm onLoginSuccess={onLoginSuccess} />
-                    <Button type="primary" htmlType="submit" onClick={()=>setRegistrationForm(true)} style={{marginLeft: "30px"}}>
-                        Register
-                    </Button>
-                    </>
-                )}
+                    <RegisterForm onSuccess={onRegisterSuccess} />
+                    </div>
+                    )}
                 </div>
             </div>
       </Header>
