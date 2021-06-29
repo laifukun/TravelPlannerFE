@@ -1,11 +1,16 @@
-import React, { useState, } from "react";
+import React, { useState, useEffect} from "react";
 import { GoogleMap, useLoadScript, Marker, InfoWindow, DirectionsService, DirectionsRenderer } from "@react-google-maps/api";
 import * as POIData from "./POI-data-test.json";
 import mapStyles from "../styles/mapStyles";
 import PropTypes from 'prop-types'
+import {searchByRange} from '../Utils/searchUtils';
+import { message } from "antd";
 
 const libraries = ["places"];
 const mapContainerStyle = {
+    // overflow: "hidden !important" ,
+    // lineHeight: 1.35,
+    // whiteSpace: "nowrap",
     width: '100vw',
     height: '87.2vh',
 };
@@ -16,9 +21,6 @@ const imageStyle = {
     width: 100
 }
 
-// const textStyle = {
-//     textalign: 'left'
-// }
 const options = {
     styles: mapStyles,
     disableDefaultUI: true,
@@ -35,13 +37,50 @@ const DirectionsPropTypes = {
     }).isRequired,
 }
 
-function Map() {
-    const [selectedPOI, setSelectedPOI] = useState(null);
+function Map({searchData}) {
+    const[selectedPOI, setSelectedPOI] = useState(null);
+    const [position, setPosition] = useState({
+        lat: 40.748440,
+        lng: -73.985664
+      });
 
     const { isLoaded, loadError } = useLoadScript({
         googleMapsApiKey: process.env.REACT_APP_GOOGLEMAP_API,
         libraries,
     });
+
+    function handleLoad(map) {
+        mapRef.current = map;
+      }
+    
+      function handleCenterChanged() {
+        if (!mapRef.current) return;
+        const newPos = mapRef.current.getCenter().toJSON();
+        setPosition(newPos);
+        console.log(newPos)
+      }
+
+    const [RangeData, setRangeData] = useState([]);
+    const [loading, setLoading] = useState(false);
+
+    useEffect(() => {
+        setLoading(true);
+        searchByRange(position.lat, position.lng, 500)
+            .then((data) => {
+                setRangeData(data);
+            })
+            .catch((err) => {
+                message.error(err.message);
+            })
+            .finally(() => {
+                setLoading(false);
+            });
+    });
+
+
+    const POIdata = searchData ? searchData : RangeData;
+
+   
 
     const mapRef = React.useRef();
     const onMapLoad = React.useCallback((map) => {
@@ -216,19 +255,24 @@ function Map() {
 
             <GoogleMap
                 // id="map"
+                // onLoad={map => setMapRef(map)}
+                onLoad={handleLoad}
                 mapContainerStyle={mapContainerStyle}
-                zoom={10}
+                onCenterChanged={handleCenterChanged}
+                zoom={13}
                 center={center}
                 options={options}
-            // onClick={onMapClick}
-            // onLoad={onMapLoad}
+                
+                // onClick={onMapClick}
+                onLoad={onMapLoad}
             >
-                {POIData.features.map(POI => (
+                
+                {POIdata.map(POI => (
                     <Marker
-                        key={POI.properties.poiid}
-                        position={{
-                            lat: POI.geometry.coordinates[1],
-                            lng: POI.geometry.coordinates[0]
+                        key = {POI.poiId}
+                        position = {{
+                            lat: POI.lat,
+                            lng: POI.lng
                         }}
                         onClick={() => {
                             setSelectedPOI(POI);
@@ -240,11 +284,14 @@ function Map() {
                     />
                 ))}
 
+                <h3>
+                Center {center.lat}, {center.lng}
+                </h3>
                 {selectedPOI && (
                     <InfoWindow
-                        position={{
-                            lat: selectedPOI.geometry.coordinates[1],
-                            lng: selectedPOI.geometry.coordinates[0]
+                        position = {{
+                            lat: selectedPOI.lat,
+                            lng: selectedPOI.lng
                         }}
                         onCloseClick={() => {
                             setSelectedPOI(null);
@@ -252,18 +299,19 @@ function Map() {
                     >
                         <div>
                             <div >
-                                <img
-                                    src={selectedPOI.properties.imageUrl}
-                                    style={imageStyle}
+                                <img 
+                                    src={selectedPOI.imageUrl}
+                                    style = {imageStyle}
                                 />
                             </div>
                             <div >
-                                <b>{selectedPOI.properties.NAME}</b>
-                                <br />
-                                Address: {selectedPOI.properties.ADDRESS}
-                                <br />
-                                Description: {selectedPOI.properties.description}
+                                <b>{selectedPOI.name}</b>
+                                <br/>
+                                Description: {selectedPOI.description}
                             </div>
+                            <button type="button">
+                                Show details
+                            </button>
                         </div>
                     </InfoWindow>
                 )}

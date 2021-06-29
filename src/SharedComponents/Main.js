@@ -33,6 +33,7 @@ function Main(props) {
     const onRegisterSuccess = () =>{}
 
     return (
+<<<<<<< HEAD
         <Layout style={{ height: "80vh" }}>
 
         <Header>
@@ -45,6 +46,28 @@ function Main(props) {
                     <div className="login-button">
                     <LoginForm onLoginSuccess={onLoginSuccess} />
                     <RegisterForm onSuccess={onRegisterSuccess} />
+=======
+        <Layout style={{ height: "100vh" }}>
+            {authed ? (
+              <Content
+                    style={{
+                    padding: "50px",
+                    maxHeight: "calc(100% - 64px)",
+                    overflowY: "auto",
+                }}>  This is content!   </Content>
+            ) : (
+                <Content
+                    style={{
+                    padding: "50px",
+                    maxHeight: "calc(100% - 64px)",
+                    overflowY: "auto",
+                }}> 
+                    <LoginForm onSuccess={() => setAuthed(true)} />
+                    <div className="site-drawer-render-in-current-wrapper">
+                        {/* 这里填充components */}
+                        <KeywordSearch loadSearchResult={(data)=>setSearchResults(data)}/>
+                        <Map searchData = {searchResults}/>
+>>>>>>> 2ee22a69b84f6cd37ae4ff127f3b04e44528f52f
                     </div>
                     )}
                 </div>
