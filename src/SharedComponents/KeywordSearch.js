@@ -31,13 +31,13 @@ const KeywordSearch = ({loadSearchResult, loadSelectedPOI}) => {
     }
 
     return (
-        <div style={{position: 'absolute', height: '100%'}}>
+        <>
             <div className='search-input'>
              <Search
                 placeholder="input keyword"
                 loading={loading}
                 enterButton="Search"
-                size="large"
+                size="medium"
                 onSearch={onSearch}
             />
             </div>
@@ -47,7 +47,7 @@ const KeywordSearch = ({loadSearchResult, loadSelectedPOI}) => {
             onClose={onCloseResults}
             onSelectPOI={onPickedPOI}
             />
-        </div>
+        </>
     )
 }
 

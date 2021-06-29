@@ -6,6 +6,7 @@
     background: #fafafa;
     border: 1px solid #ebedf0;
     border-radius: 2px;
+    height: 100%;
   }
 
 .map {
@@ -39,10 +40,8 @@
 
 .footer {
   position: relative;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  margin: auto;
+  padding-top:5px;
+  height: 30px;
   width: 100%;
   background-color:#282c34;
   text-align: center;

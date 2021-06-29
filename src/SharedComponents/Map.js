@@ -14,29 +14,22 @@ const mapContainerStyle = {
     // lineHeight: 1.35,
     // whiteSpace: "nowrap",
     width: '100vw',
-    height: '87.2vh',
+    height: '100%',
 };
-
-
 
 const options = {
     styles: mapStyles,
     disableDefaultUI: true,
     zoomControl: true,
 };
-/*
-const center = {
-    lat: 41.748440,
-    lng: -73.985664,
-};
-*/
+
 const DirectionsPropTypes = {
     styles: PropTypes.shape({
         container: PropTypes.object.isRequired,
     }).isRequired,
 }
 
-function Map({searchData, pickedPOI}) {
+function Map({searchData, pickedPOI, routePoints}) {
     const[selectedPOI, setSelectedPOI] = useState(null);
     const [center, setCenter] = useState({
         lat: 40.748440,
@@ -51,6 +44,10 @@ function Map({searchData, pickedPOI}) {
         libraries,
     });
 
+    const [response, setResponse] = useState(null)
+    const [directionReq, setDirectionReq]=useState(null);
+
+
     function handleLoad(map) {
         mapRef.current = map;
       }
@@ -62,15 +59,45 @@ function Map({searchData, pickedPOI}) {
         console.log(newPos)
     }
 
-    const onSelectPOI = (poi)=> {
-        setSelectedPOI(poi);
-        setCenter({lat: poi.lat, lng: poi.lng});
-    }
+
+    /* if picked POI is updated from search results or route drawer
+    Centerize that POI and show details
+    */
     useEffect(()=>{
         if (pickedPOI) {
             onSelectPOI(pickedPOI);
         }
     }, [pickedPOI])
+
+    /* if route points is passed in, generate and show route */
+    useEffect(()=>{
+        if(routePoints) {
+            onGenerateRoute(routePoints);
+        }
+    }, [routePoints])
+
+    const onSelectPOI = (poi)=> {
+        setSelectedPOI(poi);
+        setCenter({lat: poi.lat, lng: poi.lng});
+    }
+
+    const onGenerateRoute=(routePoints)=> {
+
+        const directReq = {
+            origin: routePoints.startAddress,
+            destination: routePoints.endAddress,
+            travelMode: "DRIVING",
+        }
+        const waypoints = [];
+        routePoints.poiList.forEach (poi => {
+            waypoints.push({
+                location: {lat: poi.lat, lng: poi.lng},
+                stopover: true
+            })
+        })
+        directReq.waypoints = waypoints;
+        setDirectionReq(directReq);
+    }
 /*
     useEffect(() => {
         setLoading(true);
@@ -101,12 +128,7 @@ function Map({searchData, pickedPOI}) {
         mapRef.current.setZoom(14);
     }, [])
 
-    const [response, setResponse] = React.useState(null)
-    const [travelMode, setTravelMode] = React.useState('DRIVING')
-    const [origin, setOrigin] = React.useState('')
-    const [destination, setDestination] = React.useState('')
-    const originRef = React.useRef()
-    const destinationRef = React.useRef()
+
 
     const directionsCallback = React.useCallback((res) => {
         console.log(res)
@@ -120,40 +142,9 @@ function Map({searchData, pickedPOI}) {
         }
     }, [])
 
-    const checkDriving = React.useCallback(({ target: { checked } }) => {
-        checked && setTravelMode('DRIVING')
-    }, [])
-
-    const checkBicycling = React.useCallback(({ target: { checked } }) => {
-        checked && setTravelMode('BICYCLING')
-    }, [])
-
-    const checkTransit = React.useCallback(({ target: { checked } }) => {
-        checked && setTravelMode('TRANSIT')
-    }, [])
-
-    const checkWalking = React.useCallback(({ target: { checked } }) => {
-        checked && setTravelMode('WALKING')
-    }, [])
-
-    const onClick = React.useCallback(() => {
-        if (originRef.current.value !== '' && destinationRef.current.value !== '') {
-            setOrigin(originRef.current.value)
-            setDestination(destinationRef.current.value)
-            console.log('click on Build Route 01')
-        }
-        console.log('click on Build Route 02')
-    }, [])
-
     const onMapClick = React.useCallback((...args) => {
         console.log('onClick args: ', args)
     }, [])
-
-    let directionsServiceOptions = {
-        destination: destination,
-        origin: origin,
-        travelMode: travelMode,
-    }
 
     let directionsRendererOptions = {
         directions: response,
@@ -166,101 +157,8 @@ function Map({searchData, pickedPOI}) {
     if (!isLoaded) return "Loading...";
 
     return (
-        <div>
-            <div className='map-settings'>
-                <hr className='mt-0 mb-3' />
-
-                <div className='row'>
-                    <div className='col-md-6 col-lg-4'>
-                        <div className='form-group'>
-                            <label htmlFor='ORIGIN'>Origin</label>
-                            <br />
-                            <input
-                                id='ORIGIN'
-                                className='form-control'
-                                type='text'
-                                ref={originRef}
-                            />
-                        </div>
-                    </div>
-
-                    <div className='col-md-6 col-lg-4'>
-                        <div className='form-group'>
-                            <label htmlFor='DESTINATION'>Destination</label>
-                            <br />
-                            <input
-                                id='DESTINATION'
-                                className='form-control'
-                                type='text'
-                                ref={destinationRef}
-                            />
-                        </div>
-                    </div>
-                </div>
-
-                <div className='d-flex flex-wrap'>
-                    <div className='form-group custom-control custom-radio mr-4'>
-                        <input
-                            id='DRIVING'
-                            className='custom-control-input'
-                            name='travelMode'
-                            type='radio'
-                            checked={travelMode === 'DRIVING'}
-                            onChange={checkDriving}
-                        />
-                        <label className='custom-control-label' htmlFor='DRIVING'>
-                            Driving
-                        </label>
-                    </div>
-
-                    <div className='form-group custom-control custom-radio mr-4'>
-                        <input
-                            id='BICYCLING'
-                            className='custom-control-input'
-                            name='travelMode'
-                            type='radio'
-                            checked={travelMode === 'BICYCLING'}
-                            onChange={checkBicycling}
-                        />
-                        <label className='custom-control-label' htmlFor='BICYCLING'>
-                            Bicycling
-                        </label>
-                    </div>
-
-                    <div className='form-group custom-control custom-radio mr-4'>
-                        <input
-                            id='TRANSIT'
-                            className='custom-control-input'
-                            name='travelMode'
-                            type='radio'
-                            checked={travelMode === 'TRANSIT'}
-                            onChange={checkTransit}
-                        />
-                        <label className='custom-control-label' htmlFor='TRANSIT'>
-                            Transit
-                        </label>
-                    </div>
-
-                    <div className='form-group custom-control custom-radio mr-4'>
-                        <input
-                            id='WALKING'
-                            className='custom-control-input'
-                            name='travelMode'
-                            type='radio'
-                            checked={travelMode === 'WALKING'}
-                            onChange={checkWalking}
-                        />
-                        <label className='custom-control-label' htmlFor='WALKING'>
-                            Walking
-                        </label>
-                    </div>
-                </div>
-
-                <button className='btn btn-primary' type='button' onClick={onClick}>
-                    Build Route
-                </button>
-
-            </div>
+        <div style={{height: "inherit"}}>
+            
 
             <GoogleMap
                 // id="map"
@@ -293,9 +191,6 @@ function Map({searchData, pickedPOI}) {
                     />
                 ))}
 
-                <h3>
-                Center {center.lat}, {center.lng}
-                </h3>
                 {selectedPOI && (
                     <InfoWindow
                         position = {{
@@ -324,9 +219,9 @@ function Map({searchData, pickedPOI}) {
                     </InfoWindow>
                 )}
 
-                {destination !== '' && origin !== '' && (
+                {directionReq && (
                     <DirectionsService
-                        options={directionsServiceOptions}
+                        options={directionReq}
                         callback={directionsCallback}
                     />
                 )}

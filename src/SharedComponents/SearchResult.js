@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Button, Drawer, List, message, Typography, Tooltip, Card} from "antd";
-import '../styles/SearchResult.css';
+import '../styles/Search.css';
 
 function SearchResult({searchData, visible, onClose, onSelectPOI}) {
     //const [resultVisible, setResultVisible] = useState(false);
@@ -17,25 +17,26 @@ function SearchResult({searchData, visible, onClose, onSelectPOI}) {
            <Drawer
                 onClose={onCloseDrawer}
                 visible={visible }
-                width={425}
+                width={375}
                 placement='left'
                 style={{ position: 'absolute', paddingTop: '0px', paddingBottom: '0px', zIndex: '5' }}
                 getContainer={false}
             >
 
                 <List
-                    style={{ marginTop: 40, marginLeft: 0 }}
+                    style={{ marginTop: 40, marginLeft: 10 }}
                     loading={loading}
                     dataSource={searchData}
                     renderItem={(item) => (
-                      <List.Item>
+                      <List.Item style={{paddingBottom: 1, border: "hidden"}}
+                      >
                         <Card
                           hoverable
-                          style ={{width: 350, maxHeight: 450}}
+                          style ={{width: 270, maxHeight: 400, border: "hidden" }}
                           cover={<img
                               src={item.imageUrl}
                               alt={item.name}
-                              style={{ height: 300, display: "block" }}
+                              style={{ height: 200, display: "block" }}
                             />}
                             onClick={()=>onClickPOI(item)}
                         >

@@ -1,4 +1,4 @@
-export const getRouteDetails = (routeId) => {
+export const getRouteDetailsById = (routeId) => {
     return fetch(`/routes/${routeId}`).then((response) => {
       if (response.status !== 200) {
         throw Error("Fail to get Route details");
