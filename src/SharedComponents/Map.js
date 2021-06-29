@@ -5,7 +5,7 @@ import mapStyles from "../styles/mapStyles";
 import PropTypes from 'prop-types'
 import {searchByRange} from '../Utils/searchUtils';
 import "../styles/Map.css"
-import { Button, Image, Card } from "antd";
+import { Button, Image, Card, message } from "antd";
 
 
 const libraries = ["places"];
@@ -29,9 +29,14 @@ const DirectionsPropTypes = {
     }).isRequired,
 }
 
+
 function Map({searchData, pickedPOI, routePoints}) {
     const[selectedPOI, setSelectedPOI] = useState(null);
-    const [center, setCenter] = useState({
+    const [position, setPosition] = useState({
+        lat: 40.748440,
+        lng: -73.985664
+      });
+      const [center, setCenter] = useState({
         lat: 40.748440,
         lng: -73.985664
       });
@@ -55,7 +60,7 @@ function Map({searchData, pickedPOI, routePoints}) {
     function handleCenterChanged() {
         if (!mapRef.current) return;
         const newPos = mapRef.current.getCenter().toJSON();
-        //setCenter(newPos);
+        setPosition(newPos);
         console.log(newPos)
     }
 
@@ -98,10 +103,11 @@ function Map({searchData, pickedPOI, routePoints}) {
         directReq.waypoints = waypoints;
         setDirectionReq(directReq);
     }
-/*
+
     useEffect(() => {
         setLoading(true);
-        searchByRange(center.lat, center.lng, 500)
+        console.log(position);
+        searchByRange(position.lat, position.lng, 500)
             .then((data) => {
                 setRangeData(data);
             })
@@ -111,8 +117,8 @@ function Map({searchData, pickedPOI, routePoints}) {
             .finally(() => {
                 setLoading(false);
             });
-    });
-*/
+    }, [position]);
+
 
     const POIdata = searchData ? searchData : RangeData;
 
