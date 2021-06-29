@@ -21,6 +21,7 @@ function Main(props) {
     const [searchResults, setSearchResults] = useState();
 
 
+
     return (
         <Layout style={{ height: "100vh" }}>
             {authed ? (
@@ -40,7 +41,7 @@ function Main(props) {
                     <Router history={createBrowserHistory()}>
                         <Route path="/Login" render={(props) => (<LoginForm {...props} onSuccess={() => setAuthed(true)} />)} />                                             
                         <LoginButtonWithRouter></LoginButtonWithRouter>
-                        <Route path="/Register" render={(props) => (<RegisterForm {...props} onSuccess={() => <LoginForm onSuccess = { () => setAuthed(true) }/>} />)} />                                             
+                        <Route path="/Register" component = {RegisterForm} />                                             
                         <RegisterButtonWithRouter></RegisterButtonWithRouter>
                     </Router>
                     

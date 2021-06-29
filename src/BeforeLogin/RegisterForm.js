@@ -11,11 +11,12 @@ function RegisterForm(props) {
    
  
     function onFinish(data) {
+        
         setLoading(true);
         register(data)
         .then(() => {
             message.success(`Registration Successful`);
-            props.onSuccess();
+            props.history.push('/Login');
         })
         .catch((err) => {
             message.error(err.message);
