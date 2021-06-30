@@ -69,7 +69,7 @@ function Map({initCenter, searchData, pickedPOI, routePoints}) {
     }
 
 
-    
+
     useEffect(()=>{
         if (!center){
             setCenter(initCenter);
@@ -168,10 +168,6 @@ function Map({initCenter, searchData, pickedPOI, routePoints}) {
                 console.log('response: ', res)
             }
         }
-    }, [])
-
-    const onMapClick = React.useCallback((...args) => {
-        console.log('onClick args: ', args)
     }, [])
 
     let directionsRendererOptions = {
