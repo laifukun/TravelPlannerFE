@@ -21,6 +21,11 @@ function Main(props) {
     const [pickedPOI, setPickedPOI] = useState();
     const [user, setUser] =useState();
     const [route, setRoute] = useState();
+    const [addedPOI, setAddedPOI] = useState(null);
+
+    const setTripPOI = (poi) => {
+        setAddedPOI(poi);
+    }
 
     const onLoginSuccess = (username) => {        
         getUserInfo(username).then((data)=> {
@@ -76,8 +81,13 @@ function Main(props) {
                 loadSelectedPOI={ (item)=>setPickedPOI(item) }
                 />
 
-                <Map searchData = {searchResults} pickedPOI={pickedPOI} routePoints={route}/>
-                
+                <Map 
+                    searchData = {searchResults} 
+                    pickedPOI={pickedPOI} 
+                    routePoints={route}
+                    AddPOI={(poi) => setTripPOI(poi)}
+                />
+            
             </div>
         </ Content>
 

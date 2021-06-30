@@ -30,7 +30,7 @@ const DirectionsPropTypes = {
 }
 
 
-function Map({searchData, pickedPOI, routePoints}) {
+function Map({searchData, pickedPOI, routePoints, addPOI}) {
     const[selectedPOI, setSelectedPOI] = useState(null);
     const [position, setPosition] = useState({
         lat: 40.748440,
@@ -51,6 +51,8 @@ function Map({searchData, pickedPOI, routePoints}) {
 
     const [response, setResponse] = useState(null)
     const [directionReq, setDirectionReq]=useState(null);
+
+    const [addPOI, setAddPOI] = useState(null);
 
 
     function handleLoad(map) {
@@ -157,8 +159,10 @@ function Map({searchData, pickedPOI, routePoints}) {
     }
 
     const onAddPOItoRoute = (poi)=>{
-        console.log("onAddPOItoRoute");
+        addPOI(poi);
+        console.log(poi);
     }
+
     if (loadError) return "Error";
     if (!isLoaded) return "Loading...";
 
