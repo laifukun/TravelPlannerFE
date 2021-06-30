@@ -1,16 +1,23 @@
 import React, { Component } from "react";
 import {Layout, Button, message} from "antd";
 import POIInstruction from  './POIInstruction';
+<<<<<<< HEAD
 import LoginForm from "../BeforeLogin/LoginForm";
 import RegisterForm from "../BeforeLogin/RegisterForm";
 import Logout from "../AfterLogin/LogOut"
+=======
+>>>>>>> fe0dbcbd4dc13e2f7a82354965c562935a8128a2
 import { useState } from "react";
 import '../styles/Main.css';
 import KeywordSearch from './KeywordSearch';
 import Map from './Map';
+<<<<<<< HEAD
 import { getUserInfo } from "../Utils/userUtils";
 import { getAllRoutes, getRouteDetailsById } from "../Utils/routeUtils";
 
+=======
+import RouteDrawer from '../AfterLogin/RouteDrawer';
+>>>>>>> fe0dbcbd4dc13e2f7a82354965c562935a8128a2
 
 
 const { Header, Content, Footer} = Layout;

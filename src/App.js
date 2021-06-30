@@ -1,7 +1,6 @@
 import './styles/App.css';
 import Header from './SharedComponents/Header';
 import Footer from './SharedComponents/Footer';
-import Canvas from './SharedComponents/Canvas';
 import Main from './SharedComponents/Main';
 
 function App() {

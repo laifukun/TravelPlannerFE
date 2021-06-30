@@ -13,6 +13,7 @@ export const login = (credential) => {
         throw Error("Fail to log in");
       }
     });
+<<<<<<< HEAD
 };
 
 export const register = (data) => {
@@ -31,3 +32,16 @@ export const register = (data) => {
     }
   });
 };
+=======
+  };
+
+  export const getRoute = () => {
+    return fetch("/routes").then((response) => {
+      if (response.status !== 200) {
+        throw Error("Fail to get shopping cart data");
+      }
+   
+      return response.json();
+    });
+  };
+>>>>>>> fe0dbcbd4dc13e2f7a82354965c562935a8128a2
