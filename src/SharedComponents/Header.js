@@ -1,12 +1,13 @@
 import '../styles/Header.css'
+import RouteDrawer from '../AfterLogin/RouteDrawer';
 
 function Header(props) {
     return (
-            <header className="App-header">
-                <p className="title">
-                    Travel Planner
-                </p>
-            </header>
+        <header className="header" style={{display: "flex", justifyContent: "space-between"}}>
+            <p className="title">
+              Travel Planner
+            </p>
+        </header>
     )
 }
 

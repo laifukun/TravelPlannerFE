@@ -1,12 +1,11 @@
 import React, { Component } from "react";
 import {Layout} from "antd";
 import POIInstruction from  './POIInstruction';
-import LoginForm from "../BeforeLogin/LoginForm";
 import { useState } from "react";
 import '../styles/Main.css';
 import KeywordSearch from './KeywordSearch';
 import Map from './Map';
-
+import RouteDrawer from '../AfterLogin/RouteDrawer';
 
 const { Content } = Layout;
 
@@ -24,16 +23,11 @@ function Main() {
                     overflowY: "auto",
                 }}>  This is content!   </Content>
             ) : (
-                <Content
-                    style={{
-                    padding: "50px",
-                    maxHeight: "calc(100% - 64px)",
-                    overflowY: "auto",
-                }}> 
-                    <LoginForm onSuccess={() => setAuthed(true)} />
+                <Content> 
                     <div className="site-drawer-render-in-current-wrapper">
                         {/* 这里填充components */}
                         <KeywordSearch loadSearchResult={(data)=>setSearchResults(data)}/>
+                        <RouteDrawer />
                         <Map />
                     </div>
                 </ Content>

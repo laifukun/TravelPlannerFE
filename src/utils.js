@@ -14,3 +14,13 @@ export const login = (credential) => {
       }
     });
   };
+
+  export const getRoute = () => {
+    return fetch("/routes").then((response) => {
+      if (response.status !== 200) {
+        throw Error("Fail to get shopping cart data");
+      }
+   
+      return response.json();
+    });
+  };

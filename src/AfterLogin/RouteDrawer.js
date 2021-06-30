@@ -1,266 +1,170 @@
-import React from "react";
-import { DirectionsRenderer } from '@react-google-maps/api';
+import { useEffect, useState} from "react";
+import { Button, Drawer, List, Divider, message, Input, Form, Space, Row, Col} from "antd";
+import '../styles/RouteDrawer.css';
+import { getRoute } from "../utils";
+import TextArea from "antd/lib/input/TextArea";
 
-const { Component } = require('react');
-const { GoogleMap, LoadScript, DirectionsService } = require("../../");
-const ScriptLoaded = require("../../docs/ScriptLoaded").default;
+const RouteDrawer = () =>{
+  const [isVisible, setIsVisible] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [routeData, setRouteData] = useState();
 
-class Directions extends Component {
-  constructor (props) {
-    super(props)
+  const data = [
+    {
+      url: 'https://icity-static.icitycdn.com/images/uploads/ap/imsm/museum/pic_head/pd82g36/36555c82a37cfd71pd82g36.jpg',
+      title: 'New York Museum 1',
+      description: 'New York Museum 2',
+    },
+    {
+      url: 'https://images.lvltravels.com/img/usa/9/how-get-into-new-york-city-museums_1.jpg',
+      title: 'New York Museum 1',
+      description: 'New York Museum 2',
+    },
+    {
+      url: 'https://cdn.pixabay.com/photo/2017/04/27/00/04/the-met-2264072_960_720.jpg',
+      title: 'New York Museum 1',
+      description: 'New York Museum 2',
+    },
+    {
+      url: 'https://img.ianstravels.com/img/united-states/see-nyc-museums-for-free-with-bank-of-america-and-its-affiliates-2.jpg',
+      title: 'New York Museum 1',
+      description: 'New York Museum 2',
+    },
+  ];
 
-    this.state = {
-      response: null,
-      travelMode: 'DRIVING',
-      origin: '',
-      destination: ''
-    }
+  const onCloseDrawer = () => {
+      setIsVisible(false);
+  };
+   
+  const onOpenDrawer = () => {
+      setIsVisible(true);
+  };
 
-    this.directionsCallback = this.directionsCallback.bind(this)
-    this.checkDriving = this.checkDriving.bind(this)
-    this.checkBicycling = this.checkBicycling.bind(this)
-    this.checkTransit = this.checkTransit.bind(this)
-    this.checkWalking = this.checkWalking.bind(this)
-    this.getOrigin = this.getOrigin.bind(this)
-    this.getDestination = this.getDestination.bind(this)
-    this.onClick = this.onClick.bind(this)
-    this.onMapClick = this.onMapClick.bind(this)
-  }
+  const onFinish = values => {
+    console.log('Received values of form:', values);
+  };
 
-  directionsCallback (response) {
-    console.log(response)
+  useEffect(() => {
+    if (!isVisible) {
+      return;
+    } 
+    setLoading(true);
+    getRoute()
+    .then((data) => {
+      setRouteData(data);
+    })
+    .catch((err) => {
+      message.error(err.message);
+    })
+    .finally(() => {
+      setLoading(false);
+    });
+  }, [isVisible]);
 
-    if (response !== null) {
-      if (response.status === 'OK') {
-        this.setState(
-          () => ({
-            response
-          })
-        )
-      } else {
-        console.log('response: ', response)
-      }
-    }
-  }
-
-  checkDriving ({ target: { checked } }) {
-    checked &&
-      this.setState(
-        () => ({
-          travelMode: 'DRIVING'
-        })
-      )
-  }
-
-  checkBicycling ({ target: { checked } }) {
-    checked &&
-      this.setState(
-        () => ({
-          travelMode: 'BICYCLING'
-        })
-      )
-  }
-
-  checkTransit ({ target: { checked } }) {
-    checked &&
-      this.setState(
-        () => ({
-          travelMode: 'TRANSIT'
-        })
-      )
-  }
-
-  checkWalking ({ target: { checked } }) {
-    checked &&
-      this.setState(
-        () => ({
-          travelMode: 'WALKING'
-        })
-      )
-  }
-
-  getOrigin (ref) {
-    this.origin = ref
-  }
-
-  getDestination (ref) {
-    this.destination = ref
-  }
-
-  onClick () {
-    if (this.origin.value !== '' && this.destination.value !== '') {
-      this.setState(
-        () => ({
-          origin: this.origin.value,
-          destination: this.destination.value
-        })
-      )
-    }
-  }
-
-  onMapClick (...args) {
-    console.log('onClick args: ', args)
-  }
-
-  render () {
-    return (
-      <div className='map'>
-        <div className='map-settings'>
-          <hr className='mt-0 mb-3' />
-
-          <div className='row'>
-            <div className='col-md-6 col-lg-4'>
-              <div className='form-group'>
-                <label htmlFor='ORIGIN'>Origin</label>
-                <br />
-                <input id='ORIGIN' className='form-control' type='text' ref={this.getOrigin} />
-              </div>
-            </div>
-
-            <div className='col-md-6 col-lg-4'>
-              <div className='form-group'>
-                <label htmlFor='DESTINATION'>Destination</label>
-                <br />
-                <input id='DESTINATION' className='form-control' type='text' ref={this.getDestination} />
-              </div>
-            </div>
-          </div>
-
-          <div className='d-flex flex-wrap'>
-            <div className='form-group custom-control custom-radio mr-4'>
-              <input
-                id='DRIVING'
-                className='custom-control-input'
-                name='travelMode'
-                type='radio'
-                checked={this.state.travelMode === 'DRIVING'}
-                onChange={this.checkDriving}
-              />
-              <label className='custom-control-label' htmlFor='DRIVING'>Driving</label>
-            </div>
-
-            <div className='form-group custom-control custom-radio mr-4'>
-              <input
-                id='BICYCLING'
-                className='custom-control-input'
-                name='travelMode'
-                type='radio'
-                checked={this.state.travelMode === 'BICYCLING'}
-                onChange={this.checkBicycling}
-              />
-              <label className='custom-control-label' htmlFor='BICYCLING'>Bicycling</label>
-            </div>
-
-            <div className='form-group custom-control custom-radio mr-4'>
-              <input
-                id='TRANSIT'
-                className='custom-control-input'
-                name='travelMode'
-                type='radio'
-                checked={this.state.travelMode === 'TRANSIT'}
-                onChange={this.checkTransit}
-              />
-              <label className='custom-control-label' htmlFor='TRANSIT'>Transit</label>
-            </div>
-
-            <div className='form-group custom-control custom-radio mr-4'>
-              <input
-                id='WALKING'
-                className='custom-control-input'
-                name='travelMode'
-                type='radio'
-                checked={this.state.travelMode === 'WALKING'}
-                onChange={this.checkWalking}
-              />
-              <label className='custom-control-label' htmlFor='WALKING'>Walking</label>
-            </div>
-          </div>
-
-          <button className='btn btn-primary' type='button' onClick={this.onClick}>
-            Build Route
-          </button>
-        </div>
-
-        <div className='map-container'>
-          <GoogleMap
-            // required
-            id='direction-example'
-            // required
-            mapContainerStyle={{
-              height: '400px',
-              width: '100%'
-            }}
-            // required
-            zoom={2}
-            // required
-            center={{
-              lat: 0,
-              lng: -180
-            }}
-            // optional
-            onClick={this.onMapClick}
-            // optional
-            onLoad={map => {
-              console.log('DirectionsRenderer onLoad map: ', map)
-            }}
-            // optional
-            onUnmount={map => {
-              console.log('DirectionsRenderer onUnmount map: ', map)
-            }}
-          >
-            {
-              (
-                this.state.destination !== '' &&
-                this.state.origin !== ''
-              ) && (
-                <DirectionsService
-                  // required
-                  options={{ // eslint-disable-line react-perf/jsx-no-new-object-as-prop
-                    destination: this.state.destination,
-                    origin: this.state.origin,
-                    travelMode: this.state.travelMode
-                  }}
-                  // required
-                  callback={this.directionsCallback}
-                  // optional
-                  onLoad={directionsService => {
-                    console.log('DirectionsService onLoad directionsService: ', directionsService)
-                  }}
-                  // optional
-                  onUnmount={directionsService => {
-                    console.log('DirectionsService onUnmount directionsService: ', directionsService)
-                  }}
-                />
-              )
-            }
-
-            {
-              this.state.response !== null && (
-                <DirectionsRenderer
-                  // required
-                  options={{ // eslint-disable-line react-perf/jsx-no-new-object-as-prop
-                    directions: this.state.response
-                  }}
-                  // optional
-                  onLoad={directionsRenderer => {
-                    console.log('DirectionsRenderer onLoad directionsRenderer: ', directionsRenderer)
-                  }}
-                  // optional
-                  onUnmount={directionsRenderer => {
-                    console.log('DirectionsRenderer onUnmount directionsRenderer: ', directionsRenderer)
-                  }}
-                />
-              )
-            }
-          </GoogleMap>
-        </div>
+  return (
+    <div>
+      <div className ='route-position'> 
+      <Button type="primary" onClick={onOpenDrawer} size="large">
+        Route
+      </Button>
       </div>
-    )
-  }
-}
+      <Drawer
+        title="YOUR PLAN"
+        onClose={onCloseDrawer}
+        visible={isVisible}
+        width={400}
+        placement='right'
+        style={{ position: 'absolute', paddingTop: '0px', paddingBottom: '0px', zIndex: '10' }}
+        getContainer={false}
+     >
+      <Form name="dynamic_form_nest_item" onFinish={onFinish} autoComplete="off">
+      <Form.List name="routes">
+        {(fields, { add, remove }) => (
+          <>
+            {fields.map(({ key, name, fieldKey, ...restField }) => (
+              <Space direction="vertical" key={key} style={{ marginBottom: 20 , width: 350}}>
 
-<ScriptLoaded>
-  <Directions />
-</ScriptLoaded>
+                <Form.Item
+                  rules={[
+                    {
+                      required: true,
+                      whitespace: true,
+                      message: "Please input route's name at this field.",
+                    },
+                  ]}
+                  {...restField}
+                  name={[name, 'route-name']}
+                  fieldKey={[fieldKey, 'route-name']}
+                >
+                  <Input size="large" placeholder="Customize your route name here." autoSize/>
+                </Form.Item>
+
+                <Form.Item
+                  {...restField}
+                  name={[name, 'departure']}
+                  fieldKey={[fieldKey, 'departure']}
+                >
+                  <TextArea defaultValue = {routeData?.startAddress} placeholder="STARTING FROM" autoSize/>
+                </Form.Item>
+
+                <Form.Item
+                  {...restField}
+                  name={[name, 'poi']}
+                  fieldKey={[fieldKey, 'poi']}
+                >
+                <List
+                loading={loading}
+                itemLayout="horizontal"
+                dataSource={data}
+                renderItem={(item) => (
+                  
+                  <List.Item>
+                    <List.Item.Meta
+                      avatar={<img src={item.url} width="80" height="60"></img>}
+                      title={item.title}
+                      description={item.description}
+                    />
+                  </List.Item>
+                )}
+                />
+                </Form.Item>
+
+                <Form.Item
+                  {...restField}
+                  name={[name, 'destination']}
+                  fieldKey={[fieldKey, 'destination']}
+                >
+                  <TextArea defaultValue = {routeData?.endAddress} placeholder="DESTINATION" autoSize/>
+                </Form.Item>
+                <Row>
+                  <Col span={12}>
+                    <Button type="primary" htmlType="submit">
+                      Generate
+                    </Button>
+                  </Col>
+                  <Col span={12}>
+                    <Button type="primary" onClick={() => remove(name)} >
+                      Remove
+                    </Button>
+                  </Col>
+                </Row>
+                <Divider />
+              </Space>
+            ))}
+            <Form.Item>
+              <Button type="dashed" onClick={() => add()} width = '80'>
+                Add route
+              </Button>
+            </Form.Item>
+          </>
+        )}
+      </Form.List>
+      <Divider />
+    </Form>
+    </Drawer>
+    </div>
+    
+  )
+}
 
 export default RouteDrawer
