@@ -25,6 +25,8 @@ const KeywordSearch = ({loadSearchResult, loadSelectedPOI}) => {
 
     const onCloseResults = ()=>{
         setResultVisible(false);
+        setResults([]);
+        loadSearchResult([]);
     }
     const onPickedPOI = (item)=> {
         loadSelectedPOI(item);

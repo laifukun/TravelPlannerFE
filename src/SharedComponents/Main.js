@@ -17,10 +17,16 @@ const { Header, Content, Footer} = Layout;
 
 function Main(props) {
     const [authed, setAuthed] = useState(false);
-    const [searchResults, setSearchResults] = useState();
+    const [searchResults, setSearchResults] = useState([]);
     const [pickedPOI, setPickedPOI] = useState();
     const [user, setUser] =useState();
     const [route, setRoute] = useState();
+
+
+    const initCenter = ({
+        lat: 40.748440,
+        lng: -73.985664
+      });
 
     const onLoginSuccess = (username) => {        
         getUserInfo(username).then((data)=> {
@@ -72,11 +78,16 @@ function Main(props) {
             <div className="site-drawer-render-in-current-wrapper">
                             {/* 这里填充components */}
                 <KeywordSearch 
-                loadSearchResult={(data)=>setSearchResults(data)} 
-                loadSelectedPOI={ (item)=>setPickedPOI(item) }
+                    loadSearchResult={(data)=>setSearchResults(data)} 
+                    loadSelectedPOI={ (item)=>setPickedPOI(item) }
                 />
 
-                <Map searchData = {searchResults} pickedPOI={pickedPOI} routePoints={route}/>
+                <Map 
+                    initCenter ={initCenter} 
+                    searchData = {searchResults} 
+                    pickedPOI={pickedPOI} 
+                    routePoints={route}
+                />
                 
             </div>
         </ Content>

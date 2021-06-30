@@ -21,6 +21,8 @@ function SearchResult({searchData, visible, onClose, onSelectPOI}) {
                 placement='left'
                 style={{ position: 'absolute', paddingTop: '0px', paddingBottom: '0px', zIndex: '5' }}
                 getContainer={false}
+                maskClosable={false}
+                mask={false}
             >
 
                 <List
