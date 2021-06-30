@@ -5,7 +5,7 @@ import mapStyles from "../styles/mapStyles";
 import PropTypes from 'prop-types'
 import {searchByRange} from '../Utils/searchUtils';
 import "../styles/Map.css"
-import { Button, Image, Card } from "antd";
+import { Button, Image, Card, message } from "antd";
 
 
 const libraries = ["places"];
@@ -29,14 +29,15 @@ const DirectionsPropTypes = {
     }).isRequired,
 }
 
-function Map({searchData, pickedPOI, routePoints}) {
-    const[selectedPOI, setSelectedPOI] = useState(null);
-    const [center, setCenter] = useState({
-        lat: 40.748440,
-        lng: -73.985664
-      });
 
-    const [RangeData, setRangeData] = useState([]);
+function Map({initCenter, searchData, pickedPOI, routePoints}) {
+
+    const mapRef = React.useRef();
+    const[selectedPOI, setSelectedPOI] = useState(null);
+    const[center, setCenter] = useState();
+    const[showNearBy, setShowNearBy] = useState(true);
+
+    const [POIData, setPOIData] = useState([]);
     const [loading, setLoading] = useState(false);
 
     const { isLoaded, loadError } = useLoadScript({
@@ -50,15 +51,31 @@ function Map({searchData, pickedPOI, routePoints}) {
 
     function handleLoad(map) {
         mapRef.current = map;
-      }
+    }
     
-    function handleCenterChanged() {
+    function handleBoundsChanged() {
         if (!mapRef.current) return;
-        const newPos = mapRef.current.getCenter().toJSON();
-        //setCenter(newPos);
-        console.log(newPos)
+        //const newPos = mapRef.current.getCenter().toJSON();
+       // setPosition(newPos);
+      // setCenter(newPos);
+        //console.log(newPos)
+       // if(searchData.length !== 0) {
+       //     setPOIData(searchData);
+       // } else {     
+          
+      //  if (showNearBy)       
+      //      getNearbyPOIs();
+        //}
     }
 
+
+
+    useEffect(()=>{
+        if (!center){
+            setCenter(initCenter);
+        }
+
+    })
 
     /* if picked POI is updated from search results or route drawer
     Centerize that POI and show details
@@ -98,12 +115,29 @@ function Map({searchData, pickedPOI, routePoints}) {
         directReq.waypoints = waypoints;
         setDirectionReq(directReq);
     }
-/*
-    useEffect(() => {
-        setLoading(true);
-        searchByRange(center.lat, center.lng, 500)
+
+    useEffect( ()=> {
+        if(searchData.length !== 0) {
+            setPOIData(searchData);
+            setShowNearBy(false);
+        } else {         
+            setShowNearBy(true);              
+            getNearbyPOIs();
+        }
+        console.log("search data changed")
+    },[searchData])
+
+    const getNearbyPOIs = ()=> {
+        if (!mapRef.current) return;
+        
+        const ne = mapRef.current.getBounds().getNorthEast().toJSON();
+        const c = mapRef.current.getCenter().toJSON();
+
+        const radius = haversine_distance(c,ne);
+
+        searchByRange(c.lat, c.lng, radius)
             .then((data) => {
-                setRangeData(data);
+                setPOIData(data);
             })
             .catch((err) => {
                 message.error(err.message);
@@ -111,24 +145,18 @@ function Map({searchData, pickedPOI, routePoints}) {
             .finally(() => {
                 setLoading(false);
             });
-    });
-*/
+    }
 
-    const POIdata = searchData ? searchData : RangeData;
-
-   
-
-    const mapRef = React.useRef();
-    const onMapLoad = React.useCallback((map) => {
-        mapRef.current = map;
-    }, [])
-
-    const panTo = React.useCallback(({ lat, lng }) => {
-        mapRef.current.panTo({ lat, lng });
-        mapRef.current.setZoom(14);
-    }, [])
-
-
+    function haversine_distance(p1, p2) {
+        var R = 6371; // Radius of the Earth in kms
+        var rlat1 = p1.lat * (Math.PI/180); // Convert degrees to radians
+        var rlat2 = p2.lat * (Math.PI/180); // Convert degrees to radians
+        var difflat = rlat2-rlat1; // Radian difference (latitudes)
+        var difflon = (p2.lng-p1.lng) * (Math.PI/180); // Radian difference (longitudes)
+  
+        var d = 2 * R * Math.asin(Math.sqrt(Math.sin(difflat/2)*Math.sin(difflat/2)+Math.cos(rlat1)*Math.cos(rlat2)*Math.sin(difflon/2)*Math.sin(difflon/2)));
+        return d;
+      }
 
     const directionsCallback = React.useCallback((res) => {
         console.log(res)
@@ -140,10 +168,6 @@ function Map({searchData, pickedPOI, routePoints}) {
                 console.log('response: ', res)
             }
         }
-    }, [])
-
-    const onMapClick = React.useCallback((...args) => {
-        console.log('onClick args: ', args)
     }, [])
 
     let directionsRendererOptions = {
@@ -161,20 +185,19 @@ function Map({searchData, pickedPOI, routePoints}) {
             
 
             <GoogleMap
-                // id="map"
-                // onLoad={map => setMapRef(map)}
-                onLoad={handleLoad}
+                
                 mapContainerStyle={mapContainerStyle}
-                onCenterChanged={handleCenterChanged}
+                onBoundsChanged={handleBoundsChanged}
                 zoom={13}
                 center={center}
                 options={options}
-                
-                // onClick={onMapClick}
-                onLoad={onMapLoad}
+                onLoad={handleLoad}
+                onTilesLoaded={ ()=>{ if (showNearBy)
+                 getNearbyPOIs()}}
+
             >
                 
-                {POIdata.map(POI => (
+                {POIData.map(POI => (
                     <Marker
                         key = {POI.poiId}
                         position = {{
