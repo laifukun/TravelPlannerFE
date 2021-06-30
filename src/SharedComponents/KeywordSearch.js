@@ -6,7 +6,7 @@ import {searchByKeyword} from '../Utils/searchUtils';
 const {Search} = Input;
 
 
-const KeywordSearch = ({loadSearchResult}) => {
+const KeywordSearch = ({loadSearchResult, loadSelectedPOI}) => {
     const [loading, setLoading] = useState(false);
     const [results, setResults] = useState();
     const [resultVisible, setResultVisible] = useState(false);
@@ -26,20 +26,28 @@ const KeywordSearch = ({loadSearchResult}) => {
     const onCloseResults = ()=>{
         setResultVisible(false);
     }
+    const onPickedPOI = (item)=> {
+        loadSelectedPOI(item);
+    }
 
     return (
-        <div style={{position: 'absolute', height: '100%'}}>
+        <>
             <div className='search-input'>
              <Search
                 placeholder="input keyword"
                 loading={loading}
                 enterButton="Search"
-                size="large"
+                size="medium"
                 onSearch={onSearch}
             />
             </div>
-            <SearchResult searchData={results}  visible={resultVisible} onClose={onCloseResults}/>
-        </div>
+            <SearchResult 
+            searchData={results}  
+            visible={resultVisible} 
+            onClose={onCloseResults}
+            onSelectPOI={onPickedPOI}
+            />
+        </>
     )
 }
 

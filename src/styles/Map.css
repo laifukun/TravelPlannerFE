@@ -1,0 +1,23 @@
+.info-window {
+    display: flex;
+    justify-content:left;
+    align-items: center;
+    text-align: justify;
+}
+
+.info-image{
+    width: 150px;
+    height: 300px;
+    height: inherit;
+    float: left;
+}
+
+.card-button {
+    height: 200px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding-left: 5px;
+}
+    
+    

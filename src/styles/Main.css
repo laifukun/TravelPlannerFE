@@ -6,6 +6,7 @@
     background: #fafafa;
     border: 1px solid #ebedf0;
     border-radius: 2px;
+    height: 100%;
   }
 
 .map {
@@ -15,8 +16,8 @@
 .header {
   display: flex;
   align-items: center;
+  width: 100%;
   justify-content: space-between;
-  width: 100vw;
   color: #fff;
   height: inherit;
   /*background-color: #282c34;*/
@@ -28,20 +29,19 @@
   font-size: 30px;
   font-weight: bold;
   margin-bottom: 0px;
+  padding-left: 50px;
 }
 .login-button {
  width: 200px;
- margin-right: 100px;
+ margin-right: 50px;
  display: flex;
  justify-content: space-between;
 }
 
 .footer {
   position: relative;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  margin: auto;
+  padding-top:5px;
+  height: 30px;
   width: 100%;
   background-color:#282c34;
   text-align: center;
@@ -53,7 +53,7 @@
   font-size: 18px;
   font-weight: bold;
   width: 250px;
-  margin-right: 100px;
+  margin-right: 50px;
   display: flex;
   align-items: center;
   justify-content: space-between;
