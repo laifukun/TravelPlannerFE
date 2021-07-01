@@ -52,7 +52,7 @@ function Map({searchData, pickedPOI, routePoints, addPOI}) {
     const [response, setResponse] = useState(null)
     const [directionReq, setDirectionReq]=useState(null);
 
-    const [addPOI, setAddPOI] = useState(null);
+    // const [addPOI, setAddPOI] = useState(null);
 
 
     function handleLoad(map) {
