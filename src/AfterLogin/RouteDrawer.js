@@ -1,67 +1,90 @@
 import { useEffect, useState} from "react";
-import { Button, Drawer, List, Divider, message, Input, Form, Space, Row, Col, Tooltip} from "antd";
+import { Button, Drawer, List, Modal, message, Input, Form, Space, Row, Col, Tooltip} from "antd";
 import {DoubleRightOutlined,MinusSquareFilled, MenuOutlined, MediumCircleFill} from "@ant-design/icons";
 import '../styles/RouteDrawer.css';
-import { getAllRoutes } from "../Utils/routeUtils";
+import { getAllRoutes, deleteRoute, saveRoute } from "../Utils/routeUtils";
 import TextArea from "antd/lib/input/TextArea";
 import SortList from "./DragList";
 
+const data2 = [
+  {
+    id: 72,
+    url: "http://localhost:8000/api/courseware/course_section/72/",
+    course_id: 37,
+    name: "Okay",
+    ordering: 1,
+    published_at: null,
+    subsections: [
+      "http://localhost:8000/api/courseware/course_subsection/57/",
+      "http://localhost:8000/api/courseware/course_subsection/58/"
+    ]
+  },
+  {
+    id: 74,
+    url: "http://localhost:8000/api/courseware/course_section/74/",
+    course_id: 37,
+    name: "y",
+    ordering: 2,
+    published_at: null,
+    subsections: []
+  },
+  {
+    id: 75,
+    url: "http://localhost:8000/api/courseware/course_section/75/",
+    course_id: 37,
+    name: "o",
+    ordering: 3,
+    published_at: null,
+    subsections: []
+  },
+  {
+    id: 76,
+    url: "http://localhost:8000/api/courseware/course_section/76/",
+    course_id: 37,
+    name: "o",
+    ordering: 4,
+    published_at: null,
+    subsections: [
+      "http://localhost:8000/api/courseware/course_subsection/59/",
+      "http://localhost:8000/api/courseware/course_subsection/60/",
+      "http://localhost:8000/api/courseware/course_subsection/61/",
+      "http://localhost:8000/api/courseware/course_subsection/62/",
+      "http://localhost:8000/api/courseware/course_subsection/63/",
+      "http://localhost:8000/api/courseware/course_subsection/64/",
+      "http://localhost:8000/api/courseware/course_subsection/65/"
+    ]
+  }
+];
+
+
+const RoutePOI = ({route, generateRouteOnMap, saveRoute})=> {
+
+  return (
+    <div style={{paddingLeft: 30}}>
+      <Input defaultValue={route.name} />
+        <SortList routeData={route} />
+      <Input defaultValue={route.name} />
+      <div>
+        <Button type="primary" onClick={(route) => generateRouteOnMap(route)} width = '80'>
+              Generate route
+        </Button>
+        <Button type="primary" onClick={(route) => saveRoute(route)} width = '80'>
+              Save route
+        </Button>
+      </div>
+      
+    </div>
+  );
+
+}
 
 const RouteDrawer = () =>{
   const [visible, setVisible] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [routeData, setRouteData] = useState([]);
+  const [routeData, setRouteData] = useState(data2);
+  const [routeNameModalVisible, setRouteNameModalVisible] = useState(false);
 
-  const data2 = [
-    {
-      id: 72,
-      url: "http://localhost:8000/api/courseware/course_section/72/",
-      course_id: 37,
-      name: "Okay",
-      ordering: 1,
-      published_at: null,
-      subsections: [
-        "http://localhost:8000/api/courseware/course_subsection/57/",
-        "http://localhost:8000/api/courseware/course_subsection/58/"
-      ]
-    },
-    {
-      id: 74,
-      url: "http://localhost:8000/api/courseware/course_section/74/",
-      course_id: 37,
-      name: "y",
-      ordering: 2,
-      published_at: null,
-      subsections: []
-    },
-    {
-      id: 75,
-      url: "http://localhost:8000/api/courseware/course_section/75/",
-      course_id: 37,
-      name: "o",
-      ordering: 3,
-      published_at: null,
-      subsections: []
-    },
-    {
-      id: 76,
-      url: "http://localhost:8000/api/courseware/course_section/76/",
-      course_id: 37,
-      name: "o",
-      ordering: 4,
-      published_at: null,
-      subsections: [
-        "http://localhost:8000/api/courseware/course_subsection/59/",
-        "http://localhost:8000/api/courseware/course_subsection/60/",
-        "http://localhost:8000/api/courseware/course_subsection/61/",
-        "http://localhost:8000/api/courseware/course_subsection/62/",
-        "http://localhost:8000/api/courseware/course_subsection/63/",
-        "http://localhost:8000/api/courseware/course_subsection/64/",
-        "http://localhost:8000/api/courseware/course_subsection/65/"
-      ]
-    }
-  ];
-  
+ 
   const data = [
     {
       url: 'https://icity-static.icitycdn.com/images/uploads/ap/imsm/museum/pic_head/pd82g36/36555c82a37cfd71pd82g36.jpg',
@@ -90,7 +113,7 @@ const RouteDrawer = () =>{
   };
    
   const onOpenDrawer = () => {
-    getRouteData();
+    //getRouteData();
     setVisible(true);
   };
 
@@ -112,6 +135,42 @@ const RouteDrawer = () =>{
     });
   }
  
+  const onRemoveRoute= (routeId)=> {
+    //setRouteData(routeData.filter(item=>item.routeId !== routeId));
+    //deleteRoute(routeId);
+  }
+
+  const onInputNewRouteName =(data)=>{
+      console.log(data.routeName);
+      setLoading(true);
+      const newRoute = {
+        "name": data.routeName,
+        "startAddress": "",
+        "endAddress": "",
+        "poiList": null,
+      };
+      setRouteData([...routeData, newRoute]);
+      setLoading(false);
+      setRouteNameModalVisible(false);
+  }
+  
+  const onCloseRouteNameModal = () => {
+    setRouteNameModalVisible(false);
+  }
+
+  const onRenderRoute = (route) => {
+
+  }
+
+  const onSaveRoute =(route) => {
+    setLoading(true);
+    saveRoute.catch((err) => {
+      message.error(err.message);
+    }).finally(() => {
+      setLoading(false);
+    });
+  }
+
   return (
     <>
       <div className ='route-position'> 
@@ -152,18 +211,50 @@ const RouteDrawer = () =>{
                 <Button
                   type="primary"
                   icon={<MinusSquareFilled />}
-                  //onClick={removeFromCart}
+                  onClick={onRemoveRoute(item.routeId)}
                 />
                 </Tooltip> 
               </div>
-              <div style={{paddingLeft: 30}}>
-                <SortList routeData={data} 
-              />
-              </div>
+              <RoutePOI route ={data}>
+
+              </RoutePOI>
+              
               
           </List.Item>
           )}
         />
+
+        <Button type="dashed" onClick={() => {setRouteNameModalVisible(true)}} width = '200'>
+              Add route
+        </Button>
+        <Modal 
+          title ="Input route name"
+          visible={routeNameModalVisible}
+          onCancel={onCloseRouteNameModal}
+          footer={[
+              <Form
+              name="route-name-input"
+              onFinish={onInputNewRouteName}
+              style={{
+                  width: 300,
+                  margin: "auto",
+              }}
+              >
+              <Form.Item
+                  name="routeName"
+                  rules={[{ required: true, message: "Please input your route name!" }]}
+              >
+                  <Input placeholder="route name" defaultValue="new route"/>
+              </Form.Item>
+
+              <Form.Item>
+                  <Button type="primary" htmlType="submit">
+                    Confirm
+                  </Button>
+              </Form.Item>
+              </Form>,]}
+          >
+        </Modal>
     
       {/*
       <Form name="dynamic_form_nest_item" onFinish={onFinish} autoComplete="off">
