@@ -1,40 +1,94 @@
 import React, { Component } from "react";
-import {Layout} from "antd";
+import {Layout, Button, message} from "antd";
 import POIInstruction from  './POIInstruction';
+import LoginForm from "../BeforeLogin/LoginForm";
+import RegisterForm from "../BeforeLogin/RegisterForm";
+import Logout from "../AfterLogin/LogOut"
+import RouteDrawer from "../AfterLogin/RouteDrawer"
 import { useState } from "react";
 import '../styles/Main.css';
 import KeywordSearch from './KeywordSearch';
 import Map from './Map';
-import RouteDrawer from '../AfterLogin/RouteDrawer';
+import { getUserInfo } from "../Utils/userUtils";
+import { getAllRoutes, getRouteDetailsById } from "../Utils/routeUtils";
 
-const { Content } = Layout;
 
-function Main() {
+
+const { Header, Content, Footer} = Layout;
+
+function Main(props) {
     const [authed, setAuthed] = useState(false);
     const [searchResults, setSearchResults] = useState();
+    const [pickedPOI, setPickedPOI] = useState();
+    const [user, setUser] =useState();
+    const [route, setRoute] = useState();
+
+    const onLoginSuccess = (username) => {        
+        getUserInfo(username).then((data)=> {
+            setUser(data);
+        }).catch((err) => {
+            message.error(err.message);
+        }).finally(()=>{
+            setAuthed(true);
+        });   
+
+        getRouteDetailsById(5).then((data)=>{
+            setRoute(data);
+        }).catch((err) => {
+            message.error(err.message);
+        }).finally(()=>{
+            setAuthed(true);
+        }); 
+     }
+    
+    const onRegisterSuccess = () =>{}
+    const onLogoutSuccess = ()=> {
+        setAuthed(false);
+    }
 
     return (
-        <Layout style={{ height: "100vh" }}>
-            {authed ? (
-              <Content
-                    style={{
-                    padding: "50px",
-                    maxHeight: "calc(100% - 64px)",
-                    overflowY: "auto",
-                }}>  This is content!   </Content>
-            ) : (
-                <Content> 
-                    <div className="site-drawer-render-in-current-wrapper">
-                        {/* 这里填充components */}
-                        <KeywordSearch loadSearchResult={(data)=>setSearchResults(data)}/>
-                        <RouteDrawer />
-                        <Map />
+        <Layout style={{display: "flex", justifyContent: "space-between", height: "100vh" }}>
+
+            <Header style={{paddingLeft: 0, paddingRight: 0}}>
+                <div className="header">
+                    <div className="title">
+                    Travel Planner
                     </div>
-                </ Content>
-            )}
+                    <>
+                        {authed ? ( <div className="welcome"> 
+                                        <div>Welcome <strong> {`${user.firstName}`} </strong> ! </div> 
+                                        <Logout onLogoutSuccess={onLogoutSuccess} /> 
+                                    </div> ) : (
+                        <div className="login-button">
+                        <LoginForm onLoginSuccess={onLoginSuccess} />
+                        <RegisterForm onSuccess={onRegisterSuccess} />
+                        </div>
+                        )}
+                    </>
+                </div>
+        </Header>
+
+        <Content> 
         
-        </Layout>
-      );
+            <div className="site-drawer-render-in-current-wrapper">
+                            {/* 这里填充components */}
+                <KeywordSearch 
+                loadSearchResult={(data)=>setSearchResults(data)} 
+                loadSelectedPOI={ (item)=>setPickedPOI(item) }
+                />
+
+                <RouteDrawer />
+
+                <Map searchData = {searchResults} pickedPOI={pickedPOI} routePoints={route}/>
+                
+            </div>
+        </ Content>
+
+        <Footer className="footer">
+                ©2021 Travel Planner. All Rights Reserved. Developed by FLAG Team 2
+        </Footer>
+    </Layout>
+    );
   }
   
 export default Main;

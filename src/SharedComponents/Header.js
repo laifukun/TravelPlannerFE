@@ -1,13 +1,23 @@
-import '../styles/Header.css'
-import RouteDrawer from '../AfterLogin/RouteDrawer';
+//import '../styles/Header.css'
+import { Button, Form, Input, message } from "antd";
 
 function Header(props) {
+
     return (
-        <header className="header" style={{display: "flex", justifyContent: "space-between"}}>
-            <p className="title">
-              Travel Planner
-            </p>
-        </header>
+            <header className="App-header">
+                <p className="title">
+                    Travel Planner
+                </p>
+                <div className="login-button">
+                    <Button type="primary" htmlType="submit">
+                    Login
+                    </Button>
+                    <Button type="primary" htmlType="submit" style={{marginLeft: "30px"}}>
+                    Registe
+                    </Button>
+                </div>
+            </header>
+            
     )
 }
 

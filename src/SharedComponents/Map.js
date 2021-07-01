@@ -1,112 +1,240 @@
-import React, {useState} from "react";
-import {GoogleMap, useLoadScript, Marker, InfoWindow,} from "@react-google-maps/api";
+import React, { useState, useEffect} from "react";
+import { GoogleMap, useLoadScript, Marker, InfoWindow, DirectionsService, DirectionsRenderer } from "@react-google-maps/api";
 import * as POIData from "./POI-data-test.json";
 import mapStyles from "../styles/mapStyles";
+import PropTypes from 'prop-types'
+import {searchByRange} from '../Utils/searchUtils';
+import "../styles/Map.css"
+import { Button, Image, Card } from "antd";
+
 
 const libraries = ["places"];
 const mapContainerStyle = {
+    // overflow: "hidden !important" ,
+    // lineHeight: 1.35,
+    // whiteSpace: "nowrap",
     width: '100vw',
-    height: '87.2vh',
+    height: '100%',
 };
 
-const imageStyle = {
-    alt: "img",
-    float: 'left',
-    width: 100
-}
-
-// const textStyle = {
-//     textalign: 'left'
-// }
 const options = {
     styles: mapStyles,
     disableDefaultUI: true,
     zoomControl: true,
 };
-const center = {
-    lat: 40.748440,
-    lng: -73.985664,
-};
 
-function Map() {
+const DirectionsPropTypes = {
+    styles: PropTypes.shape({
+        container: PropTypes.object.isRequired,
+    }).isRequired,
+}
+
+function Map({searchData, pickedPOI, routePoints}) {
     const[selectedPOI, setSelectedPOI] = useState(null);
+    const [center, setCenter] = useState({
+        lat: 40.748440,
+        lng: -73.985664
+      });
 
-    const {isLoaded, loadError} = useLoadScript({
+    const [RangeData, setRangeData] = useState([]);
+    const [loading, setLoading] = useState(false);
+
+    const { isLoaded, loadError } = useLoadScript({
         googleMapsApiKey: process.env.REACT_APP_GOOGLEMAP_API,
         libraries,
     });
+
+    const [response, setResponse] = useState(null)
+    const [directionReq, setDirectionReq]=useState(null);
+
+
+    function handleLoad(map) {
+        mapRef.current = map;
+      }
+    
+    function handleCenterChanged() {
+        if (!mapRef.current) return;
+        const newPos = mapRef.current.getCenter().toJSON();
+        //setCenter(newPos);
+        console.log(newPos)
+    }
+
+
+    /* if picked POI is updated from search results or route drawer
+    Centerize that POI and show details
+    */
+    useEffect(()=>{
+        if (pickedPOI) {
+            onSelectPOI(pickedPOI);
+        }
+    }, [pickedPOI])
+
+    /* if route points is passed in, generate and show route */
+    useEffect(()=>{
+        if(routePoints) {
+            onGenerateRoute(routePoints);
+        }
+    }, [routePoints])
+
+    const onSelectPOI = (poi)=> {
+        setSelectedPOI(poi);
+        setCenter({lat: poi.lat, lng: poi.lng});
+    }
+
+    const onGenerateRoute=(routePoints)=> {
+
+        const directReq = {
+            origin: routePoints.startAddress,
+            destination: routePoints.endAddress,
+            travelMode: "DRIVING",
+        }
+        const waypoints = [];
+        routePoints.poiList.forEach (poi => {
+            waypoints.push({
+                location: {lat: poi.lat, lng: poi.lng},
+                stopover: true
+            })
+        })
+        directReq.waypoints = waypoints;
+        setDirectionReq(directReq);
+    }
+/*
+    useEffect(() => {
+        setLoading(true);
+        searchByRange(center.lat, center.lng, 500)
+            .then((data) => {
+                setRangeData(data);
+            })
+            .catch((err) => {
+                message.error(err.message);
+            })
+            .finally(() => {
+                setLoading(false);
+            });
+    });
+*/
+
+    const POIdata = searchData ? searchData : RangeData;
+
+   
 
     const mapRef = React.useRef();
     const onMapLoad = React.useCallback((map) => {
         mapRef.current = map;
     }, [])
 
-    const panTo = React.useCallback(({lat, lng}) => {
-        mapRef.current.panTo({lat, lng});
+    const panTo = React.useCallback(({ lat, lng }) => {
+        mapRef.current.panTo({ lat, lng });
         mapRef.current.setZoom(14);
     }, [])
-    
+
+
+
+    const directionsCallback = React.useCallback((res) => {
+        console.log(res)
+
+        if (res !== null) {
+            if (res.status === 'OK') {
+                setResponse(res)
+            } else {
+                console.log('response: ', res)
+            }
+        }
+    }, [])
+
+    const onMapClick = React.useCallback((...args) => {
+        console.log('onClick args: ', args)
+    }, [])
+
+    let directionsRendererOptions = {
+        directions: response,
+    }
+
+    const onAddPOItoRoute = (poi)=>{
+        console.log("onAddPOItoRoute");
+    }
     if (loadError) return "Error";
     if (!isLoaded) return "Loading...";
 
     return (
-        <div>
+        <div style={{height: "inherit"}}>
+            
+
             <GoogleMap
                 // id="map"
+                // onLoad={map => setMapRef(map)}
+                onLoad={handleLoad}
                 mapContainerStyle={mapContainerStyle}
-                zoom={10}
+                onCenterChanged={handleCenterChanged}
+                zoom={13}
                 center={center}
                 options={options}
+                
                 // onClick={onMapClick}
-                // onLoad={onMapLoad}
+                onLoad={onMapLoad}
             >
-                {POIData.features.map(POI => (
+                
+                {POIdata.map(POI => (
                     <Marker
-                        key = {POI.properties.poiid}
+                        key = {POI.poiId}
                         position = {{
-                            lat: POI.geometry.coordinates[1],
-                            lng: POI.geometry.coordinates[0]
+                            lat: POI.lat,
+                            lng: POI.lng
                         }}
-                        onClick = {() => {
-                            setSelectedPOI(POI);
+                        onClick={() => {
+                            onSelectPOI(POI);
                         }}
-                        // icon = {{
-                        //     url: " ",
-                        //     scaledSize: new window.google.maps.Size(25, 25)
-                        // }}
+                        icon = {{
+                            url: POI.imageUrl,
+                            scaledSize: new window.google.maps.Size(50, 50)
+                        }}
                     />
                 ))}
 
                 {selectedPOI && (
                     <InfoWindow
                         position = {{
-                            lat: selectedPOI.geometry.coordinates[1],
-                            lng: selectedPOI.geometry.coordinates[0]
+                            lat: selectedPOI.lat,
+                            lng: selectedPOI.lng
                         }}
-                        onCloseClick = {() => {
+                        onCloseClick={() => {
                             setSelectedPOI(null);
                         }}
                     >
-                        <div>
-                            <div >
-                                <img 
-                                    src={selectedPOI.properties.imageUrl}
-                                    style = {imageStyle}
-                                />
-                            </div>
-                            <div >
-                                <b>{selectedPOI.properties.NAME}</b>
-                                <br/>
-                                Address: {selectedPOI.properties.ADDRESS}
-                                <br/>
-                                Description: {selectedPOI.properties.description}
-                            </div>
+                        <div className="info-window">
+                            <Image 
+                                    src={selectedPOI.imageUrl}                                    
+                                    alt={selectedPOI.name}
+                                    className="info-image"
+                             />
+                             <div className="card-button">
+                             <Card title ={selectedPOI.name} bodyStyle={{paddingTop: 0, paddingBottom: 0}}>
+                                {selectedPOI.description}                                
+                             </Card>
+                             <Button type="primary" htmlType="submit" onClick={()=>onAddPOItoRoute(selectedPOI)}>
+                                Add to Trip
+                            </Button>
+                             </div>
                         </div>
                     </InfoWindow>
                 )}
+
+                {directionReq && (
+                    <DirectionsService
+                        options={directionReq}
+                        callback={directionsCallback}
+                    />
+                )}
+
+                {response !== null && (
+                    <DirectionsRenderer options={directionsRendererOptions} />
+                )}
+
             </GoogleMap>
         </div>
     );
 }
 
+Map.propTypes = DirectionsPropTypes
+// export default React.memo(Map)
 export default Map

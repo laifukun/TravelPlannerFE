@@ -5,5 +5,27 @@
     padding: 10px 10px 10px 20px;
     text-align: left;
     height: auto;
-    width: 350px
+    width: 300px
+}
+
+.search-result {
+    position: relative;
+    z-index: 9;
+    margin: 10px 10px 10px 20px;
+    padding: 10px 10px 10px 20px;
+    text-align: left;
+}
+.search-card div div{
+    max-height: 50px;
+    max-width: 100%;
+    text-align: justify;
+    font-size: small;
+    overflow: hidden;
+    text-overflow: ellipsis;  
+    white-space: normal; 
+    -webkit-line-clamp: 2;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;  
+    margin: 0px;
+    padding: 0px;
 }

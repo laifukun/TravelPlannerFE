@@ -1,15 +1,18 @@
 import { useEffect, useState} from "react";
-import { Button, Drawer, List, Divider, message, Input, Form, Space, Row, Col} from "antd";
+import { Button, Drawer, List, Divider, message, Input, Form, Space, Row, Col, Menu} from "antd";
 import '../styles/RouteDrawer.css';
-import { getRoute } from "../utils";
+import { getAllRoutes, getRouteDetailsById} from "../Utils/routeUtils"
 import TextArea from "antd/lib/input/TextArea";
+
+const { SubMenu } = Menu;
 
 const RouteDrawer = () =>{
   const [isVisible, setIsVisible] = useState(false);
   const [loading, setLoading] = useState(false);
   const [routeData, setRouteData] = useState();
+  const [poiData, setPoiData] = useState();
 
-  const data = [
+  const data1 = [
     {
       url: 'https://icity-static.icitycdn.com/images/uploads/ap/imsm/museum/pic_head/pd82g36/36555c82a37cfd71pd82g36.jpg',
       title: 'New York Museum 1',
@@ -37,14 +40,39 @@ const RouteDrawer = () =>{
   };
    
   const onOpenDrawer = () => {
+    console.log("onOPenDrawer");
       setIsVisible(true);
+      getAllRoutes()
+      .then((data) => {
+      setRouteData(data);
+    })
+    .catch((err) => {
+      message.error(err.message);
+    })
+    .finally(() => {
+      setLoading(false);
+    });
   };
 
   const onFinish = values => {
     console.log('Received values of form:', values);
   };
 
-  useEffect(() => {
+  const handleClick = (index) => {
+    console.log('click ', index);
+    getRouteDetailsById(index)
+    .then((poiData) => {
+    setPoiData(poiData);
+  })
+  .catch((err) => {
+    message.error(err.message);
+  })
+  .finally(() => {
+    setLoading(false);
+  });
+  };
+  
+/*  useEffect(() => {
     if (!isVisible) {
       return;
     } 
@@ -60,6 +88,7 @@ const RouteDrawer = () =>{
       setLoading(false);
     });
   }, [isVisible]);
+  */
 
   return (
     <div>
@@ -72,19 +101,21 @@ const RouteDrawer = () =>{
         title="YOUR PLAN"
         onClose={onCloseDrawer}
         visible={isVisible}
-        width={400}
+        width={500}
         placement='right'
         style={{ position: 'absolute', paddingTop: '0px', paddingBottom: '0px', zIndex: '10' }}
         getContainer={false}
      >
       <Form name="dynamic_form_nest_item" onFinish={onFinish} autoComplete="off">
       <Form.List name="routes">
+      {routeData.map(field => ()}
         {(fields, { add, remove }) => (
           <>
-            {fields.map(({ key, name, fieldKey, ...restField }) => (
-              <Space direction="vertical" key={key} style={{ marginBottom: 20 , width: 350}}>
+            {fields.map(({ key , name, ...Field }) => (
+              <Space direction="vertical" key={key + 1} style={{ marginBottom: 20 , width: "inherit"}}>
 
                 <Form.Item
+                  style={{ margin: 0 }}
                   rules={[
                     {
                       required: true,
@@ -92,62 +123,48 @@ const RouteDrawer = () =>{
                       message: "Please input route's name at this field.",
                     },
                   ]}
-                  {...restField}
-                  name={[name, 'route-name']}
-                  fieldKey={[fieldKey, 'route-name']}
+                  {...Field}
+                  name={[name, {}]}
                 >
-                  <Input size="large" placeholder="Customize your route name here." autoSize/>
+                  <Menu
+                    style={{ marginLeft: 0, width: 400 }}
+                    mode="inline"
+                  >
+                    <SubMenu title={`Route ${key + 1}`}>
+                      <Menu.Item style ={{height : "inherit"}}>
+                        <TextArea label = "Drparture :" placeholder="Please enter the address properly!" autoSize/>
+                        <List
+                        loading={loading}
+                        itemLayout="horizontal"
+                        dataSource={poiData}
+                        renderItem={(item) => (
+                          
+                          <List.Item>
+                            <List.Item.Meta
+                              avatar={<img src={item.imageUrl} width="80" height="60"></img>}
+                              title={item.name}
+                              description={item.description}
+                            />
+                          </List.Item>
+                        )}
+                        />
+                        <TextArea label = "Destination :" placeholder="Please enter the address properly!" autoSize/>
+                        <Row>
+                        <Col span={12}>
+                          <Button type="primary" htmlType="submit">
+                            Generate
+                          </Button>
+                        </Col>
+                        <Col span={12}>
+                          <Button type="primary" onClick={() => remove(name)} >
+                            Remove
+                          </Button>
+                        </Col>
+                        </Row>
+                      </Menu.Item>
+                    </SubMenu>
+                  </Menu>
                 </Form.Item>
-
-                <Form.Item
-                  {...restField}
-                  name={[name, 'departure']}
-                  fieldKey={[fieldKey, 'departure']}
-                >
-                  <TextArea defaultValue = {routeData?.startAddress} placeholder="STARTING FROM" autoSize/>
-                </Form.Item>
-
-                <Form.Item
-                  {...restField}
-                  name={[name, 'poi']}
-                  fieldKey={[fieldKey, 'poi']}
-                >
-                <List
-                loading={loading}
-                itemLayout="horizontal"
-                dataSource={data}
-                renderItem={(item) => (
-                  
-                  <List.Item>
-                    <List.Item.Meta
-                      avatar={<img src={item.url} width="80" height="60"></img>}
-                      title={item.title}
-                      description={item.description}
-                    />
-                  </List.Item>
-                )}
-                />
-                </Form.Item>
-
-                <Form.Item
-                  {...restField}
-                  name={[name, 'destination']}
-                  fieldKey={[fieldKey, 'destination']}
-                >
-                  <TextArea defaultValue = {routeData?.endAddress} placeholder="DESTINATION" autoSize/>
-                </Form.Item>
-                <Row>
-                  <Col span={12}>
-                    <Button type="primary" htmlType="submit">
-                      Generate
-                    </Button>
-                  </Col>
-                  <Col span={12}>
-                    <Button type="primary" onClick={() => remove(name)} >
-                      Remove
-                    </Button>
-                  </Col>
-                </Row>
                 <Divider />
               </Space>
             ))}

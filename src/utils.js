@@ -13,14 +13,21 @@ export const login = (credential) => {
         throw Error("Fail to log in");
       }
     });
-  };
+};
 
-  export const getRoute = () => {
-    return fetch("/routes").then((response) => {
-      if (response.status !== 200) {
-        throw Error("Fail to get shopping cart data");
-      }
-   
-      return response.json();
-    });
-  };
+export const register = (data) => {
+  const registerUrl = `/signup`;
+ 
+  return fetch(registerUrl, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+   // credentials: "include",
+    body: JSON.stringify(data),
+  }).then((response) => {
+    if (response.status !== 201) {
+      throw Error("Fail to register");
+    }
+  });
+};
