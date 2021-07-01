@@ -1,6 +1,6 @@
 import { Button, Form, Input, message, Modal } from "antd";
 import React, {useState} from "react";
-import { LockOutlined, UserOutlined } from "@ant-design/icons";
+import {LockOutlined, UserOutlined } from "@ant-design/icons";
 import { login } from "../Utils/userUtils";
 
 function LoginForm({onLoginSuccess}) {
@@ -55,7 +55,7 @@ function LoginForm({onLoginSuccess}) {
                 name="password"
                 rules={[{ required: true, message: "Please input your Password!" }]}
             >
-                <Input.Password prefix={<LockOutlined />} placeholder="Password" />
+                <Input.Password prefix={<LockOutlined />} placeholder="Password" /> 
             </Form.Item>
 
             <Form.Item>
