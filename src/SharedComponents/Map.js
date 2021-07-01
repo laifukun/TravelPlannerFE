@@ -122,8 +122,8 @@ function Map({searchData, pickedPOI, routePoints, addPOI}) {
     }, [position]);
 
 
-    const POIdata = searchData ? searchData : RangeData;
-
+    // const POIdata = searchData ? searchData : RangeData;
+    const POIdata = directionReq ? [] : (searchData ? searchData : RangeData);
    
 
     const mapRef = React.useRef();

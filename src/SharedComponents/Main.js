@@ -85,7 +85,7 @@ function Main(props) {
                     searchData = {searchResults} 
                     pickedPOI={pickedPOI} 
                     routePoints={route}
-                    AddPOI={(poi) => setTripPOI(poi)}
+                    addPOI={(poi) => setTripPOI(poi)}
                 />
             
             </div>
