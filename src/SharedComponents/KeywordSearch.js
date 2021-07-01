@@ -41,6 +41,7 @@ const KeywordSearch = ({loadSearchResult, loadSelectedPOI}) => {
                 enterButton="Search"
                 size="medium"
                 onSearch={onSearch}
+                
             />
             </div>
             <SearchResult 

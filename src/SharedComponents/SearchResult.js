@@ -19,7 +19,7 @@ function SearchResult({searchData, visible, onClose, onSelectPOI}) {
                 visible={visible }
                 width={375}
                 placement='left'
-                style={{ position: 'absolute', paddingTop: '0px', paddingBottom: '0px', zIndex: '5' }}
+                style={{ position: 'absolute', paddingTop: '0px', paddingBottom: '0px', zIndex: '20' }}
                 getContainer={false}
                 maskClosable={false}
                 mask={false}

@@ -2,16 +2,16 @@ import { useEffect, useState} from "react";
 import { Button, Drawer, List, Divider, message, Input, Form, Space, Row, Col, Tooltip} from "antd";
 import {DoubleRightOutlined,MinusSquareFilled, MenuOutlined, MediumCircleFill} from "@ant-design/icons";
 import '../styles/RouteDrawer.css';
-import { getAllRoutes } from "../Utils/routeUtils";
+import { getAllRoutes, getRouteDetailsById } from "../Utils/routeUtils";
 import TextArea from "antd/lib/input/TextArea";
 import SortList from "./DragList";
+import Item from "antd/lib/list/Item";
 
 
 const RouteDrawer = () =>{
   const [visible, setVisible] = useState(false);
   const [loading, setLoading] = useState(false);
   const [routeData, setRouteData] = useState([]);
-
   const data2 = [
     {
       id: 72,
@@ -111,9 +111,49 @@ const RouteDrawer = () =>{
       setLoading(false);
     });
   }
+
+  const toggleRouteItem = (routeId) => {
+    setLoading(true);
+
+    const index = routeData.findIndex((item)=>item.routeId == routeId);
+    if (routeData[index].poiList !== null) {
+
+      setRouteData(
+        routeData.map((item)=>{
+          if (item.routeId===routeId) {
+            item.poiList = null;
+          }
+          return item;
+        })
+      ); 
+     // console.log("reset poiList" + routeData[index].poiList);  
+      setLoading(false); 
+
+    } else {
+      
+      getRouteDetailsById(routeId).then((data) => {         
+        setRouteData(
+          routeData.map((item)=>{
+            if (item.routeId===routeId) {
+              item.poiList = data.poiList;
+            }
+            return item;
+          })
+        ); 
+
+       // console.log("reset poiList" + routeData[index].poiList.length);   
+       }).catch((err) => {
+          message.error(err.message);
+        }).finally(() => {
+          setLoading(false);
+      });
+    }
+
+        
+  }
  
   return (
-    <>
+    <div>
       <div className ='route-position'> 
         <Button type="primary" onClick={onOpenDrawer} size="medium">
           Route
@@ -125,15 +165,17 @@ const RouteDrawer = () =>{
         visible={visible}
         width={400}
         placement='right'
-        style={{ position: 'absolute', paddingTop: '0px', paddingBottom: '0px', zIndex: '10' }}
+        //style={{ position: 'absolute', paddingTop: '0px', paddingLeft: '0px', paddingBottom: '0px', zIndex: '10' }}
+        className = 'route-drawer'
         getContainer={false}
         maskClosable={false}
         mask={false}
      >
        <List
-          style={{ marginTop: 0, marginLeft: 0 }}
+          style={{ marginTop: 0, marginLeft: 0, paddingLeft: '0px' }}
           loading={loading}
           dataSource={routeData}
+          bordered = {true}
           renderItem={(item) => (
           <List.Item className="route-item"
           >
@@ -142,10 +184,10 @@ const RouteDrawer = () =>{
                 <Button
                   type="text"
                   icon={<MenuOutlined />}
-                  style={{fontSize: "medium", fontWeight: "bold"}}
-                  //onClick={removeFromCart}
+                  style={{fontSize: "medium", fontWeight: "bold", paddingLeft: 0}}
+                  onClick={()=>toggleRouteItem(item.routeId)}
                 >
-                  {item.name} 
+                  {item.name}  
                 </Button>
               </Tooltip>     
               <Tooltip title="Remove route"> 
@@ -156,9 +198,8 @@ const RouteDrawer = () =>{
                 />
                 </Tooltip> 
               </div>
-              <div style={{paddingLeft: 30}}>
-                <SortList routeData={data} 
-              />
+              <div className='poi-item'>
+                {item.poiList !== null ? (<SortList poiData={item.poiList} />) : ("")}              
               </div>
               
           </List.Item>
@@ -253,7 +294,7 @@ const RouteDrawer = () =>{
                 */}
 
     </Drawer>
-    </>
+    </div>
     
   )
 }

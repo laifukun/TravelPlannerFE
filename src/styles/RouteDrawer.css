@@ -6,6 +6,12 @@ h2{
     text-align: left;
 }
 
+.route-drawer {
+    padding-left: 5px;
+    padding-right: 5px;
+    padding-top: 5px;
+}
+
 .route-position{
     position: absolute;
     z-index: 10;
@@ -21,8 +27,10 @@ h2{
     font-size: medium;
     font-weight: bold;
     text-align: left;
+    width: 100%;
     display: flex;
     justify-content: space-between;
+    padding-left: 0px;
 }
 
 .route-item {
@@ -30,4 +38,15 @@ h2{
     display: flex;
     flex-direction: column;
     justify-content: space-between;
+    padding-left: 0px;
+}
+
+.poi-list {
+    text-align: left;
+}
+
+.poi-item {
+    text-align: left;
+    padding-left: 5px;
+    padding-top: 5px;
 }

@@ -1,6 +1,6 @@
 .search-input {
     position: absolute;
-    z-index: 10;
+    z-index: 25;
     margin: 10px 10px 10px 20px;
     padding: 10px 10px 10px 20px;
     text-align: left;
