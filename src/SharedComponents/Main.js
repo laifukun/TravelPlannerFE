@@ -9,8 +9,8 @@ import '../styles/Main.css';
 import KeywordSearch from './KeywordSearch';
 import Map from './Map';
 import { getUserInfo } from "../Utils/userUtils";
-import { getAllRoutes, getRouteDetailsById } from "../Utils/routeUtils";
-
+import { getRouteDetailsById } from "../Utils/routeUtils";
+import RouteDrawer from '../AfterLogin/RouteDrawer';
 
 
 const { Header, Content, Footer} = Layout;
@@ -99,8 +99,8 @@ function Main(props) {
                                         <Logout onLogoutSuccess={onLogoutSuccess} /> 
                                     </div> ) : (
                         <div className="login-button">
-                        <LoginForm onLoginSuccess={onLoginSuccess} />
-                        <RegisterForm onSuccess={onRegisterSuccess} />
+                            <LoginForm onLoginSuccess={onLoginSuccess} />
+                            <RegisterForm onSuccess={onRegisterSuccess} />
                         </div>
                         )}
                     </>
@@ -115,7 +115,8 @@ function Main(props) {
                     loadSearchResult={(data)=>setSearchResults(data)} 
                     loadSelectedPOI={ (item)=>setPickedPOI(item) }
                 />
-
+                <RouteDrawer 
+                />
                 <Map 
                     initCenter ={initCenter} 
                     searchData = {searchResults} 

@@ -25,7 +25,7 @@ function SearchResult({searchData, visible, onClose, onSelectPOI}) {
                 mask={false}
             >
 
-                <List
+              <List
                     style={{ marginTop: 40, marginLeft: 10 }}
                     loading={loading}
                     dataSource={searchData}

@@ -44,10 +44,10 @@ const KeywordSearch = ({loadSearchResult, loadSelectedPOI}) => {
             />
             </div>
             <SearchResult 
-            searchData={results}  
-            visible={resultVisible} 
-            onClose={onCloseResults}
-            onSelectPOI={onPickedPOI}
+                searchData={results}  
+                visible={resultVisible} 
+                onClose={onCloseResults}
+                onSelectPOI={onPickedPOI}
             />
         </>
     )

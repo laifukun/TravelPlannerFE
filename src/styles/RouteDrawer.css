@@ -17,3 +17,17 @@ h2{
     width: 100%
 }
 
+.route-title{
+    font-size: medium;
+    font-weight: bold;
+    text-align: left;
+    display: flex;
+    justify-content: space-between;
+}
+
+.route-item {
+    align-items: flex-start;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
