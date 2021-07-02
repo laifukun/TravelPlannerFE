@@ -1,5 +1,5 @@
 import { useEffect, useState} from "react";
-import { Button, Drawer, List, Modal, message, Input, Form, Space, Row, Col, Tooltip} from "antd";
+import { Button, Drawer, List, Modal, message, Input, Form, Tabs, Tooltip} from "antd";
 import {DoubleRightOutlined,MinusSquareFilled, MenuOutlined, MediumCircleFill} from "@ant-design/icons";
 import '../styles/RouteDrawer.css';
 import { getAllRoutes, deleteRoute, saveRoute, getRouteDetailsById } from "../Utils/routeUtils";
@@ -7,14 +7,66 @@ import TextArea from "antd/lib/input/TextArea";
 import SortList from "./DragList";
 import Item from "antd/lib/list/Item";
 
+
+
+const panes = [
+  { id: 1,
+    name: 'Plan 1', 
+    routes: [{
+      name: "route1",
+      startAddress: "start 1",
+      endAddress: "end 1",
+      poiList: [ {
+        name: "poi 1",
+      }, {
+        name: "poi 2",
+      },]
+    },{
+      name: "route2",
+      startAddress: "start 2",
+      endAddress: "end 2",
+      poiList: [ {
+        name: "poi 1",
+      }, {
+        name: "poi 2",
+      },]
+    }] 
+  },
+  { id: 2,
+    name: 'Plan 2', 
+    routes: [{
+      routeId: 3,
+      name: "route3",
+      startAddress: "start 1",
+      endAddress: "end 1",
+      poiList: [ {
+        name: "poi 1",
+      }, {
+        name: "poi 2",
+      },]
+    },{
+      routeId: 4,
+      name: "route4",
+      startAddress: "start 2",
+      endAddress: "end 2",
+      poiList: [ {
+        name: "poi 1",
+      }, {
+        name: "poi 2",
+      },]
+    }] 
+  },
+];
+
+
 const RoutePOI = ({route, generateRoute, saveRoute, updateRoute})=> {
 
   const onChangeStartAddress=(e)=>{
-    updateRoute(route.name, "startAddress", e.target.value);
+    updateRoute('startAddress', e.target.value);
   }
 
   const onChangeEndAddress=(e)=> {
-    updateRoute(route.name, "endAddress", e.target.value);
+    updateRoute('endAddress', e.target.value);
   }
 
   return (
@@ -38,19 +90,55 @@ const RoutePOI = ({route, generateRoute, saveRoute, updateRoute})=> {
 
 }
 
+/*
+plans =[
+  {
+    id: ,
+    title: ,
+    numOfDays: , 
+    user: ,
+    routes: [
+      startAddress: 
+      endAddress:
+      poiList: []
+    ]
+  },
+  {},
+]
+*/
 const RouteDrawer = ({generateRoute, poiToTrip}) =>{
   const [visible, setVisible] = useState(false);
   const [loading, setLoading] = useState(false);
   const [routeData, setRouteData] = useState([]);
   const [routeNameModalVisible, setRouteNameModalVisible] = useState(false);
   const [poiListVisible,setPoiListVisible] = useState([]);
-
+  const [plans, setPlans] = useState(panes);
+  const [activePlan, setActivePlan] = useState("0");
+  const [activeRoute, setActiveRoute] = useState();
 
   useEffect(()=>{
     if (poiToTrip) {
-      const index = poiListVisible.findIndex((item)=>(item === true));
+      //const index = poiListVisible.findIndex((item)=>(item === true));
+
+      setPlans(plans.map(
+        (plan, id)=>{
+        if (activePlan !== id.toString()) return plan;
+        plan.routes.map((route,rId)=>{
+          if (rId === activeRoute) {
+            const poiList = route.poiList;
+            const exist = poiList.find(element=>poiToTrip.poiId == element.poiId);
+            if (!exist) {
+              route.poiList = [...poiList, poiToTrip];
+            }
+          }
+          return route;
+        });
+        return plan;
+      }));
+
+      /*
       setRouteData(
-        routeData.map((item, id)=>{
+        plans.map((item, id)=>{
           if (index === id) {
             const poiList = item.poiList;
             const exist = poiList.find(element=>poiToTrip.poiId == element.poiId);
@@ -62,6 +150,7 @@ const RouteDrawer = ({generateRoute, poiToTrip}) =>{
           return item;
         })
       );  
+      */
     }
   }, [poiToTrip]);
 
@@ -78,38 +167,50 @@ const RouteDrawer = ({generateRoute, poiToTrip}) =>{
 
   const getRouteData = ()=>{
     setLoading(true);
-    getAllRoutes()
-    .then((data) => {
+    getAllRoutes().then((data) => {
       setRouteData(data);
       setPoiListVisible(data.map((item)=>false));
-    })
-    .catch((err) => {
+    }).catch((err) => {
       message.error(err.message);
-    })
-    .finally(() => {
+    }).finally(() => {
       setLoading(false);
     });
   }
 
-  const toggleRouteItem = (routeId) => {
+  const toggleRouteItem = (routeSeq) => {
     setLoading(true);
 
-    const index = routeData.findIndex((item)=>item.routeId == routeId);
-    if (poiListVisible[index] === false) {
-      if (routeData[index].poiList === null) {
-        getRouteDetailsById(routeId).then((data) => {         
-          setRouteData(
+    //const newActiveRoute = plans[activePlan].routes.findIndex((item)=>item.routeId == routeId);
+
+    if (activeRoute===null || activeRoute !== routeSeq) {
+      if (plans[activePlan].routes[routeSeq].poiList === null) {
+        getRouteDetailsById(plans[activePlan].routes[routeSeq].routeId).then(
+          (data) => {         
+          setPlans(plans.map(
+              (plan, id)=>{
+              if (activePlan !== id.toString()) return plan;
+              plan.routes.map((route,rId)=>{
+                if (rId == routeSeq) {
+                  route.poiList = data.poiList;
+                }
+                return route;
+              });
+              return plan;
+            }));
+            /*
             routeData.map((item)=>{
               if (item.routeId===routeId) {
                 item.poiList = data.poiList;
               }
               return item;
             })
-          );   
+            */
+ 
           
         }).catch((err) => {
             message.error(err.message);
         }).finally(() => {
+          /*
             setPoiListVisible(poiListVisible.map((item, id)=>{
               if (index == id) {
                 return true;
@@ -117,9 +218,12 @@ const RouteDrawer = ({generateRoute, poiToTrip}) =>{
                 return false;
               }
             }))
+            */
+           setActiveRoute(routeSeq);
             setLoading(false);
         });
       } else {
+        /*
         setPoiListVisible(poiListVisible.map((item, id)=>{
           if (index == id) {
             return true;
@@ -127,23 +231,31 @@ const RouteDrawer = ({generateRoute, poiToTrip}) =>{
             return false;
           }
         }))
+        */
+        setActiveRoute(routeSeq);
       }       
 
     } else {
-      setPoiListVisible(poiListVisible.map((item, id)=> false))
+      //setPoiListVisible(poiListVisible.map((item, id)=> false))
+      setActiveRoute(null);
     }
     
     setLoading(false); 
         
   }
  
-  const onRemoveRoute= (routeId)=> {
-    setRouteData(routeData.filter(item=>item.routeId !== routeId));
-    deleteRoute(routeId);
+  const onRemoveRoute= (routeSeq)=> {
+    const routeId = plans[activePlan].routes[routeSeq].routeId;
+    //setRouteData(routeData.filter(item=>item.routeId !== routeId));
+    setPlans(plans.map((plan, id)=>{
+      if (id.toString() !== activePlan) return plan;
+      plan.routes.filter((route,rid)=>rid !== routeSeq);
+    }));
+    if (routeId) deleteRoute(routeId);
   }
 
   const onInputNewRouteName =(data)=>{
-      console.log(data.routeName);
+     // console.log(data.routeName);
       setLoading(true);
       const newRoute = {
         "id": null,
@@ -152,8 +264,14 @@ const RouteDrawer = ({generateRoute, poiToTrip}) =>{
         "endAddress": "",
         "poiList": [],
       };
-      setRouteData([...routeData, newRoute]);
-      setPoiListVisible([...routeData.map((item)=>false), true]);
+      setPlans(plans.map((plan, id)=>{
+        if (id.toString() !== activePlan) return plan;
+        plan.routes.push(newRoute);
+        return plan;
+      }))
+      setActiveRoute(plans[activePlan].length-1);
+      //setRouteData([...routeData, newRoute]);
+      //setPoiListVisible([...routeData.map((item)=>false), true]);
       setLoading(false);
       setRouteNameModalVisible(false);
   }
@@ -166,8 +284,19 @@ const RouteDrawer = ({generateRoute, poiToTrip}) =>{
     generateRoute(route);
   }
 
-  const onUpdateRoute = (routeName, field, value) => {
+  const onUpdateRoute = (field, value) => {
 
+    setPlans(plans.map((plan,id)=>{
+      if (id.toString() !== activePlan) return plan;
+      plan.routes.map((route,rId)=>{
+        if (rId === activeRoute) {
+          route[field] = value;
+        }
+        return route;
+      });
+      return plan;
+    }));
+    /*
     setRouteData(
       routeData.map((item)=>{
         if (item.name===routeName) {
@@ -176,6 +305,7 @@ const RouteDrawer = ({generateRoute, poiToTrip}) =>{
         return item;
       })
     ); 
+    */
   }
 
 
@@ -188,6 +318,10 @@ const RouteDrawer = ({generateRoute, poiToTrip}) =>{
     });
   }
 
+  const onPlanTabChange = (pickedPlan) => {
+    setActivePlan(pickedPlan);
+  }
+
   return (
     <div>
       <div className ='route-position'> 
@@ -196,10 +330,10 @@ const RouteDrawer = ({generateRoute, poiToTrip}) =>{
         </Button>
       </div>
       <Drawer
-        title="YOUR PLAN"
+        title="Your Traval Plans"
         onClose={onCloseDrawer}
         visible={visible}
-        width={450}
+        width={500}
         placement='right'
         style={{ position: 'absolute', paddingTop: '0px', paddingLeft: '0px', paddingBottom: '0px', zIndex: '10' }}
         className = 'route-drawer'
@@ -207,160 +341,86 @@ const RouteDrawer = ({generateRoute, poiToTrip}) =>{
         maskClosable={false}
         mask={false}
      >
-       <List
-          style={{ marginTop: 0, marginLeft: 0, paddingLeft: '0px' }}
-          loading={loading}
-          dataSource={routeData}
-          bordered = {true}
-          renderItem={(item, id) => (
-          <List.Item className="route-item"
-          >
-            <div className="route-title">
-              <Tooltip title="Route details">            
-                <Button
-                  type="text"
-                  icon={<MenuOutlined />}
-                  style={{fontSize: "medium", fontWeight: "bold", paddingLeft: 0}}
-                  onClick={()=>toggleRouteItem(item.routeId)}
-                >
-                  {item.name}  
-                </Button>
-              </Tooltip>     
-              <Tooltip title="Remove route"> 
-                <Button
-                  type="primary"
-                  icon={<MinusSquareFilled />}
-                  onClick={()=>onRemoveRoute(item.routeId)}
-                />
-                </Tooltip> 
-              </div>
-              <div className='poi-item'>
-                {poiListVisible[id] && (<RoutePOI route={item} generateRoute={onGenerateRoute} saveRoute={onSaveRoute} updateRoute={onUpdateRoute}/>) }              
-              </div>
-              
-          </List.Item>
-          )}
-        />
 
-        <Button type="dashed" onClick={() => {setRouteNameModalVisible(true)}} width = '200'>
-              Add route
-        </Button>
-        <Modal 
-          title ="Input route name"
-          visible={routeNameModalVisible}
-          onCancel={onCloseRouteNameModal}
-          footer={[
-              <Form
-              name="route-name-input"
-              onFinish={onInputNewRouteName}
-              style={{
-                  width: 300,
-                  margin: "auto",
-              }}
-              >
-              <Form.Item
-                  name="routeName"
-                  rules={[{ required: true, message: "Please input your route name!" }]}
-              >
-                  <Input placeholder="route name" defaultValue="new route"/>
-              </Form.Item>
-
-              <Form.Item>
-                  <Button type="primary" htmlType="submit">
-                    Confirm
-                  </Button>
-              </Form.Item>
-              </Form>,]}
-          >
-        </Modal>
-    
-      {/*
-      <Form name="dynamic_form_nest_item" onFinish={onFinish} autoComplete="off">
-      <Form.List name="routes">
-        {(fields, { add, remove }) => (
-          <>
-            {fields.map(({ key, name, fieldKey, ...restField }) => (
-              <Space direction="vertical" key={key} style={{ marginBottom: 20 , width: 350}}>
-
-                <Form.Item
-                  rules={[
-                    {
-                      required: true,
-                      whitespace: true,
-                      message: "Please input route's name at this field.",
-                    },
-                  ]}
-                  {...restField}
-                  name={[name, 'route-name']}
-                  fieldKey={[fieldKey, 'route-name']}
-                >
-                  <Input size="large" placeholder="Customize your route name here." autoSize/>
-                </Form.Item>
-
-                <Form.Item
-                  {...restField}
-                  name={[name, 'departure']}
-                  fieldKey={[fieldKey, 'departure']}
-                >
-                  <TextArea defaultValue = {routeData?.startAddress} placeholder="STARTING FROM" autoSize/>
-                </Form.Item>
-
-                <Form.Item
-                  {...restField}
-                  name={[name, 'poi']}
-                  fieldKey={[fieldKey, 'poi']}
-                >
-                <List
+        <Tabs
+          type="editable-card"
+          onChange={onPlanTabChange}
+          activeKey={activePlan}
+          //onEdit={onPlanTabEdit}
+        >
+          {plans.map((plan, id) => (
+            <Tabs.TabPane 
+              tab={<Input defaultValue={plan.name}/>} 
+              key={id} 
+              closable={false}
+            >
+              <List
+                style={{ marginTop: 0, marginLeft: 0, paddingLeft: '0px' }}
                 loading={loading}
-                itemLayout="horizontal"
-                dataSource={routeData}
-                renderItem={(item) => (
-                  
-                  <List.Item>
-                    <List.Item.Meta
-                      avatar={<img src={item.url} width="80" height="60"></img>}
-                      title={item.title}
-                      description={item.description}
-                    />
-                  </List.Item>
+                dataSource={plan.routes}
+                bordered = {true}
+                renderItem={(item, id) => (
+                <List.Item className="route-item">
+                  <div className="route-title">
+                    <Tooltip title="Route details">            
+                      <Button
+                        type="text"
+                        icon={<MenuOutlined />}
+                        style={{fontSize: "medium", fontWeight: "bold", paddingLeft: 0}}
+                        onClick={()=>toggleRouteItem(id)}
+                      >
+                        {item.name}  
+                      </Button>
+                    </Tooltip>     
+                    <Tooltip title="Remove route"> 
+                      <Button
+                        type="primary"
+                        icon={<MinusSquareFilled />}
+                        onClick={()=>onRemoveRoute(id)}
+                      />
+                      </Tooltip> 
+                  </div>
+                  <div className='poi-item'>
+                      {activeRoute == id && (<RoutePOI route={item} generateRoute={onGenerateRoute} saveRoute={onSaveRoute} updateRoute={onUpdateRoute}/>) }              
+                  </div>
+                    
+                </List.Item>
                 )}
-                />
-                </Form.Item>
+              />
 
-                <Form.Item
-                  {...restField}
-                  name={[name, 'destination']}
-                  fieldKey={[fieldKey, 'destination']}
-                >
-                  <TextArea defaultValue = {routeData?.endAddress} placeholder="DESTINATION" autoSize/>
-                </Form.Item>
-                <Row>
-                  <Col span={12}>
-                    <Button type="primary" htmlType="submit">
-                      Generate
-                    </Button>
-                  </Col>
-                  <Col span={12}>
-                    <Button type="primary" onClick={() => remove(name)} >
-                      Remove
-                    </Button>
-                  </Col>
-                </Row>
-                <Divider />
-              </Space>
-            ))}
-            <Form.Item>
-              <Button type="dashed" onClick={() => add()} width = '80'>
-                Add route
+              <Button type="dashed" onClick={() => {setRouteNameModalVisible(true)}} width = '200'>
+                    Add new route
               </Button>
-            </Form.Item>
-          </>
-        )}
-      </Form.List>
-      <Divider />
-    </Form>
-                */}
+              <Modal 
+                title ="Input route name"
+                visible={routeNameModalVisible}
+                onCancel={onCloseRouteNameModal}
+                footer={[
+                    <Form
+                    name="route-name-input"
+                    onFinish={onInputNewRouteName}
+                    style={{
+                        width: 300,
+                        margin: "auto",
+                    }}
+                    >
+                    <Form.Item
+                        name="routeName"
+                        rules={[{ required: true, message: "Please input your route name!" }]}
+                    >
+                        <Input placeholder="route name" defaultValue="new route"/>
+                    </Form.Item>
 
+                    <Form.Item>
+                        <Button type="primary" htmlType="submit"> Confirm </Button>
+                    </Form.Item>
+                    </Form>,]}
+                >
+              </Modal>
+            </Tabs.TabPane>
+          ))}
+        </Tabs>
+       
     </Drawer>
     </div>
     
