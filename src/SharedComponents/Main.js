@@ -21,7 +21,7 @@ function Main(props) {
     const [pickedPOI, setPickedPOI] = useState();
     const [user, setUser] =useState();
     const [route, setRoute] = useState();
-
+    const [poiToTrip, setPoiToTrip] = useState();
 
     const initCenter = ({
         lat: 40.748440,
@@ -37,6 +37,7 @@ function Main(props) {
             setAuthed(true);
         });   
 
+        /*
         getRouteDetailsById(5).then((data)=>{
             setRoute(data);
         }).catch((err) => {
@@ -44,6 +45,7 @@ function Main(props) {
         }).finally(()=>{
             setAuthed(true);
         }); 
+        */
      }
     
     const onRegisterSuccess = () =>{}
@@ -82,12 +84,15 @@ function Main(props) {
                     loadSelectedPOI={ (item)=>setPickedPOI(item) }
                 />
                 <RouteDrawer 
+                    generateRoute={(data)=>setRoute(data)}
+                    poiToTrip = {poiToTrip}
                 />
                 <Map 
                     initCenter ={initCenter} 
                     searchData = {searchResults} 
                     pickedPOI={pickedPOI} 
                     routePoints={route}
+                    addPOItoRoute={(poi)=>setPoiToTrip(poi)}
                 />
                 
             </div>

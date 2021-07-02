@@ -30,7 +30,7 @@ const DirectionsPropTypes = {
 }
 
 
-function Map({initCenter, searchData, pickedPOI, routePoints}) {
+function Map({initCenter, searchData, pickedPOI, routePoints, addPOItoRoute}) {
 
     const mapRef = React.useRef();
     const[selectedPOI, setSelectedPOI] = useState(null);
@@ -55,17 +55,7 @@ function Map({initCenter, searchData, pickedPOI, routePoints}) {
     
     function handleBoundsChanged() {
         if (!mapRef.current) return;
-        //const newPos = mapRef.current.getCenter().toJSON();
-       // setPosition(newPos);
-      // setCenter(newPos);
-        //console.log(newPos)
-       // if(searchData.length !== 0) {
-       //     setPOIData(searchData);
-       // } else {     
-          
-      //  if (showNearBy)       
-      //      getNearbyPOIs();
-        //}
+
     }
 
 
@@ -90,6 +80,12 @@ function Map({initCenter, searchData, pickedPOI, routePoints}) {
     useEffect(()=>{
         if(routePoints) {
             onGenerateRoute(routePoints);
+            setShowNearBy(false);
+            setPOIData(routePoints.poiList);
+        } else {
+            setShowNearBy(true);
+            onClearRouteRender();
+            getNearbyPOIs();
         }
     }, [routePoints])
 
@@ -114,6 +110,10 @@ function Map({initCenter, searchData, pickedPOI, routePoints}) {
         })
         directReq.waypoints = waypoints;
         setDirectionReq(directReq);
+    }
+
+    const onClearRouteRender=()=> {
+        setResponse(null);
     }
 
     useEffect( ()=> {
@@ -170,12 +170,13 @@ function Map({initCenter, searchData, pickedPOI, routePoints}) {
         }
     }, [])
 
-    let directionsRendererOptions = {
-        directions: response,
-    }
+    //let directionsRendererOptions = {
+    //    directions: response,
+    //}
 
     const onAddPOItoRoute = (poi)=>{
-        console.log("onAddPOItoRoute");
+        addPOItoRoute(poi);
+        setSelectedPOI(null);
     }
     if (loadError) return "Error";
     if (!isLoaded) return "Loading...";
@@ -209,8 +210,9 @@ function Map({initCenter, searchData, pickedPOI, routePoints}) {
                         }}
                         icon = {{
                             url: POI.imageUrl,
-                            scaledSize: new window.google.maps.Size(50, 50)
+                            scaledSize: new window.google.maps.Size(40, 40)
                         }}
+                        style={{zIndex: 30}}
                     />
                 ))}
 
@@ -226,9 +228,9 @@ function Map({initCenter, searchData, pickedPOI, routePoints}) {
                     >
                         <div className="info-window">
                             <Image 
-                                    src={selectedPOI.imageUrl}                                    
-                                    alt={selectedPOI.name}
-                                    className="info-image"
+                                src={selectedPOI.imageUrl}                                    
+                                alt={selectedPOI.name}
+                                className="info-image"
                              />
                              <div className="card-button">
                              <Card title ={selectedPOI.name} bodyStyle={{paddingTop: 0, paddingBottom: 0}}>
@@ -250,7 +252,7 @@ function Map({initCenter, searchData, pickedPOI, routePoints}) {
                 )}
 
                 {response !== null && (
-                    <DirectionsRenderer options={directionsRendererOptions} />
+                    <DirectionsRenderer options={{directions: response}} />
                 )}
 
             </GoogleMap>

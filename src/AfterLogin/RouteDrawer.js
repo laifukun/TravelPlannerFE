@@ -1,108 +1,87 @@
 import { useEffect, useState} from "react";
-import { Button, Drawer, List, Divider, message, Input, Form, Space, Row, Col, Tooltip} from "antd";
+import { Button, Drawer, List, Modal, message, Input, Form, Space, Row, Col, Tooltip} from "antd";
 import {DoubleRightOutlined,MinusSquareFilled, MenuOutlined, MediumCircleFill} from "@ant-design/icons";
 import '../styles/RouteDrawer.css';
-import { getAllRoutes, getRouteDetailsById } from "../Utils/routeUtils";
+import { getAllRoutes, deleteRoute, saveRoute, getRouteDetailsById } from "../Utils/routeUtils";
 import TextArea from "antd/lib/input/TextArea";
 import SortList from "./DragList";
 import Item from "antd/lib/list/Item";
 
+const RoutePOI = ({route, generateRoute, saveRoute, updateRoute})=> {
 
-const RouteDrawer = () =>{
+  const onChangeStartAddress=(e)=>{
+    updateRoute(route.name, "startAddress", e.target.value);
+  }
+
+  const onChangeEndAddress=(e)=> {
+    updateRoute(route.name, "endAddress", e.target.value);
+  }
+
+  return (
+    <div style={{paddingLeft: 20, width: "100%"}}>
+      <Input defaultValue={route?.startAddress} onChange={onChangeStartAddress}/>
+
+      <SortList poiData={route?.poiList} />
+
+      <Input defaultValue={route?.endAddress}  onChange={onChangeEndAddress}/>
+      <div style={{paddingTop: 20, display: 'flex', justifyContent: 'space-between'}}>
+        <Button type="primary" onClick={()=>generateRoute(route)} width = '80'>
+              Generate route
+        </Button>
+        <Button type="primary" onClick={()=>saveRoute(route)} width = '80'>
+              Save route
+        </Button>
+      </div>
+      
+    </div>
+  );
+
+}
+
+const RouteDrawer = ({generateRoute, poiToTrip}) =>{
   const [visible, setVisible] = useState(false);
   const [loading, setLoading] = useState(false);
   const [routeData, setRouteData] = useState([]);
-  const data2 = [
-    {
-      id: 72,
-      url: "http://localhost:8000/api/courseware/course_section/72/",
-      course_id: 37,
-      name: "Okay",
-      ordering: 1,
-      published_at: null,
-      subsections: [
-        "http://localhost:8000/api/courseware/course_subsection/57/",
-        "http://localhost:8000/api/courseware/course_subsection/58/"
-      ]
-    },
-    {
-      id: 74,
-      url: "http://localhost:8000/api/courseware/course_section/74/",
-      course_id: 37,
-      name: "y",
-      ordering: 2,
-      published_at: null,
-      subsections: []
-    },
-    {
-      id: 75,
-      url: "http://localhost:8000/api/courseware/course_section/75/",
-      course_id: 37,
-      name: "o",
-      ordering: 3,
-      published_at: null,
-      subsections: []
-    },
-    {
-      id: 76,
-      url: "http://localhost:8000/api/courseware/course_section/76/",
-      course_id: 37,
-      name: "o",
-      ordering: 4,
-      published_at: null,
-      subsections: [
-        "http://localhost:8000/api/courseware/course_subsection/59/",
-        "http://localhost:8000/api/courseware/course_subsection/60/",
-        "http://localhost:8000/api/courseware/course_subsection/61/",
-        "http://localhost:8000/api/courseware/course_subsection/62/",
-        "http://localhost:8000/api/courseware/course_subsection/63/",
-        "http://localhost:8000/api/courseware/course_subsection/64/",
-        "http://localhost:8000/api/courseware/course_subsection/65/"
-      ]
+  const [routeNameModalVisible, setRouteNameModalVisible] = useState(false);
+  const [poiListVisible,setPoiListVisible] = useState([]);
+
+
+  useEffect(()=>{
+    if (poiToTrip) {
+      const index = poiListVisible.findIndex((item)=>(item === true));
+      setRouteData(
+        routeData.map((item, id)=>{
+          if (index === id) {
+            const poiList = item.poiList;
+            const exist = poiList.find(element=>poiToTrip.poiId == element.poiId);
+            if (!exist) {
+              item.poiList = [...poiList, poiToTrip ];
+            }
+            
+          }
+          return item;
+        })
+      );  
     }
-  ];
-  
-  const data = [
-    {
-      url: 'https://icity-static.icitycdn.com/images/uploads/ap/imsm/museum/pic_head/pd82g36/36555c82a37cfd71pd82g36.jpg',
-      name: 'New York Museum 1',
-      description: 'New York Museum 2',
-    },
-    {
-      url: 'https://images.lvltravels.com/img/usa/9/how-get-into-new-york-city-museums_1.jpg',
-      name: 'New York Museum 1',
-      description: 'New York Museum 2',
-    },
-    {
-      url: 'https://cdn.pixabay.com/photo/2017/04/27/00/04/the-met-2264072_960_720.jpg',
-      name: 'New York Museum 1',
-      description: 'New York Museum 2',
-    },
-    {
-      url: 'https://img.ianstravels.com/img/united-states/see-nyc-museums-for-free-with-bank-of-america-and-its-affiliates-2.jpg',
-      name: 'New York Museum 1',
-      description: 'New York Museum 2',
-    },
-  ];
+  }, [poiToTrip]);
 
   const onCloseDrawer = () => {
       setVisible(false);
+      generateRoute(null);
   };
    
   const onOpenDrawer = () => {
-    getRouteData();
+    getRouteData();    
     setVisible(true);
   };
 
-  const onFinish = values => {
-    console.log('Received values of form:', values);
-  };
 
   const getRouteData = ()=>{
     setLoading(true);
     getAllRoutes()
     .then((data) => {
       setRouteData(data);
+      setPoiListVisible(data.map((item)=>false));
     })
     .catch((err) => {
       message.error(err.message);
@@ -116,42 +95,99 @@ const RouteDrawer = () =>{
     setLoading(true);
 
     const index = routeData.findIndex((item)=>item.routeId == routeId);
-    if (routeData[index].poiList !== null) {
-
-      setRouteData(
-        routeData.map((item)=>{
-          if (item.routeId===routeId) {
-            item.poiList = null;
+    if (poiListVisible[index] === false) {
+      if (routeData[index].poiList === null) {
+        getRouteDetailsById(routeId).then((data) => {         
+          setRouteData(
+            routeData.map((item)=>{
+              if (item.routeId===routeId) {
+                item.poiList = data.poiList;
+              }
+              return item;
+            })
+          );   
+          
+        }).catch((err) => {
+            message.error(err.message);
+        }).finally(() => {
+            setPoiListVisible(poiListVisible.map((item, id)=>{
+              if (index == id) {
+                return true;
+              } else {
+                return false;
+              }
+            }))
+            setLoading(false);
+        });
+      } else {
+        setPoiListVisible(poiListVisible.map((item, id)=>{
+          if (index == id) {
+            return true;
+          } else {
+            return false;
           }
-          return item;
-        })
-      ); 
-     // console.log("reset poiList" + routeData[index].poiList);  
-      setLoading(false); 
+        }))
+      }       
 
     } else {
-      
-      getRouteDetailsById(routeId).then((data) => {         
-        setRouteData(
-          routeData.map((item)=>{
-            if (item.routeId===routeId) {
-              item.poiList = data.poiList;
-            }
-            return item;
-          })
-        ); 
-
-       // console.log("reset poiList" + routeData[index].poiList.length);   
-       }).catch((err) => {
-          message.error(err.message);
-        }).finally(() => {
-          setLoading(false);
-      });
+      setPoiListVisible(poiListVisible.map((item, id)=> false))
     }
-
+    
+    setLoading(false); 
         
   }
  
+  const onRemoveRoute= (routeId)=> {
+    setRouteData(routeData.filter(item=>item.routeId !== routeId));
+    deleteRoute(routeId);
+  }
+
+  const onInputNewRouteName =(data)=>{
+      console.log(data.routeName);
+      setLoading(true);
+      const newRoute = {
+        "id": null,
+        "name": data.routeName,
+        "startAddress": "",
+        "endAddress": "",
+        "poiList": [],
+      };
+      setRouteData([...routeData, newRoute]);
+      setPoiListVisible([...routeData.map((item)=>false), true]);
+      setLoading(false);
+      setRouteNameModalVisible(false);
+  }
+  
+  const onCloseRouteNameModal = () => {
+    setRouteNameModalVisible(false);
+  }
+
+  const onGenerateRoute = (route) => {
+    generateRoute(route);
+  }
+
+  const onUpdateRoute = (routeName, field, value) => {
+
+    setRouteData(
+      routeData.map((item)=>{
+        if (item.name===routeName) {
+          item[field]=value;
+        }
+        return item;
+      })
+    ); 
+  }
+
+
+  const onSaveRoute =(route) => {
+    setLoading(true);
+    saveRoute(route).catch((err) => {
+      message.error(err.message);
+    }).finally(() => {
+      setLoading(false);
+    });
+  }
+
   return (
     <div>
       <div className ='route-position'> 
@@ -163,9 +199,9 @@ const RouteDrawer = () =>{
         title="YOUR PLAN"
         onClose={onCloseDrawer}
         visible={visible}
-        width={400}
+        width={450}
         placement='right'
-        //style={{ position: 'absolute', paddingTop: '0px', paddingLeft: '0px', paddingBottom: '0px', zIndex: '10' }}
+        style={{ position: 'absolute', paddingTop: '0px', paddingLeft: '0px', paddingBottom: '0px', zIndex: '10' }}
         className = 'route-drawer'
         getContainer={false}
         maskClosable={false}
@@ -176,7 +212,7 @@ const RouteDrawer = () =>{
           loading={loading}
           dataSource={routeData}
           bordered = {true}
-          renderItem={(item) => (
+          renderItem={(item, id) => (
           <List.Item className="route-item"
           >
             <div className="route-title">
@@ -194,17 +230,49 @@ const RouteDrawer = () =>{
                 <Button
                   type="primary"
                   icon={<MinusSquareFilled />}
-                  //onClick={removeFromCart}
+                  onClick={()=>onRemoveRoute(item.routeId)}
                 />
                 </Tooltip> 
               </div>
               <div className='poi-item'>
-                {item.poiList !== null ? (<SortList poiData={item.poiList} />) : ("")}              
+                {poiListVisible[id] && (<RoutePOI route={item} generateRoute={onGenerateRoute} saveRoute={onSaveRoute} updateRoute={onUpdateRoute}/>) }              
               </div>
               
           </List.Item>
           )}
         />
+
+        <Button type="dashed" onClick={() => {setRouteNameModalVisible(true)}} width = '200'>
+              Add route
+        </Button>
+        <Modal 
+          title ="Input route name"
+          visible={routeNameModalVisible}
+          onCancel={onCloseRouteNameModal}
+          footer={[
+              <Form
+              name="route-name-input"
+              onFinish={onInputNewRouteName}
+              style={{
+                  width: 300,
+                  margin: "auto",
+              }}
+              >
+              <Form.Item
+                  name="routeName"
+                  rules={[{ required: true, message: "Please input your route name!" }]}
+              >
+                  <Input placeholder="route name" defaultValue="new route"/>
+              </Form.Item>
+
+              <Form.Item>
+                  <Button type="primary" htmlType="submit">
+                    Confirm
+                  </Button>
+              </Form.Item>
+              </Form>,]}
+          >
+        </Modal>
     
       {/*
       <Form name="dynamic_form_nest_item" onFinish={onFinish} autoComplete="off">

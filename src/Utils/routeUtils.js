@@ -32,7 +32,7 @@ export const deleteRoute = (routeId) => {
 
 
   export const saveRoute = (data) => {
-    return fetch(`/routes}`, {
+    return fetch(`/routes`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

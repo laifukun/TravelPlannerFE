@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { RightOutlined, MenuOutlined} from "@ant-design/icons";
-import {Collapse} from "antd"
+import { RightOutlined, MenuOutlined, MinusOutlined} from "@ant-design/icons";
+import {Collapse, Button} from "antd"
 import {
   sortableContainer,
   sortableElement,
@@ -15,8 +15,13 @@ const DragHandle = sortableHandle(() => <MenuOutlined style={{ cursor: 'grab', c
 const SortableItem = sortableElement(({ value }) => (
 
       <div className='poi-item'>
-        <DragHandle />
-        {value.name}
+        <div> <DragHandle /> {value.name} </div>
+        
+        <Button
+          type="primary"
+          icon={<MinusOutlined />}
+                 // onClick={onRemoveRoute(item.routeId)}
+        />
       </div>
 
 ));
@@ -37,28 +42,23 @@ const SortableContainer = sortableContainer(({ children }) => {
 export default function SortList({poiData}) {
   const [data, setData] = useState(poiData);
 
-  /*
+  
   useEffect(()=>{
     if (poiData === null) {
-      console.log("poiData null");
       setData([]);
-    }
-    
-    else {
-      console.log("poiData non null");
+    } else {
       setData(poiData);
-    }
-      
+    }      
     
   }, [poiData])
-  */
+  
   
   const onSortEnd = ({ oldIndex, newIndex }) =>
     setData(arrayMove(data, oldIndex, newIndex));
 
   return (
-    <SortableContainer onSortEnd={onSortEnd} useDragHandle>
-      {data.map((value, index) => {
+    <SortableContainer onSortEnd={onSortEnd} useDragHandle >
+      {data?.map((value, index) => {
         return (<SortableItem key={`item-${index}`} index={index} value={value} />)
       })}
     </SortableContainer>
