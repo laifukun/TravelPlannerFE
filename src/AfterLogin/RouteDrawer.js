@@ -2,7 +2,7 @@ import { useEffect, useState} from "react";
 import { Button, Drawer, List, Modal, message, Input, Form, Tabs, Tooltip} from "antd";
 import {DoubleRightOutlined,MinusSquareFilled, MenuOutlined, MediumCircleFill} from "@ant-design/icons";
 import '../styles/RouteDrawer.css';
-import { getAllRoutes, deleteRoute, saveRoute, getRouteDetailsById } from "../Utils/routeUtils";
+import { getAllRoutes, deleteRoute, deletePlan, savePlan, getRouteDetailsById, getAllUserPlans } from "../Utils/routeUtils";
 import TextArea from "antd/lib/input/TextArea";
 import SortList from "./DragList";
 import Item from "antd/lib/list/Item";
@@ -77,12 +77,9 @@ const RoutePOI = ({route, generateRoute, saveRoute, updateRoute})=> {
 
       <Input defaultValue={route?.endAddress}  onChange={onChangeEndAddress}/>
       <div style={{paddingTop: 20, display: 'flex', justifyContent: 'space-between'}}>
-        <Button type="primary" onClick={()=>generateRoute(route)} width = '80'>
+        <Button type="primary" onClick={()=>generateRoute(route)} width = '100'>
               Generate route
-        </Button>
-        <Button type="primary" onClick={()=>saveRoute(route)} width = '80'>
-              Save route
-        </Button>
+        </Button>        
       </div>
       
     </div>
@@ -112,7 +109,7 @@ const RouteDrawer = ({generateRoute, poiToTrip}) =>{
   const [routeData, setRouteData] = useState([]);
   const [routeNameModalVisible, setRouteNameModalVisible] = useState(false);
   const [poiListVisible,setPoiListVisible] = useState([]);
-  const [plans, setPlans] = useState(panes);
+  const [plans, setPlans] = useState([]);
   const [activePlan, setActivePlan] = useState("0");
   const [activeRoute, setActiveRoute] = useState();
 
@@ -160,11 +157,23 @@ const RouteDrawer = ({generateRoute, poiToTrip}) =>{
   };
    
   const onOpenDrawer = () => {
-    getRouteData();    
-    setVisible(true);
+    //getRouteData(); 
+    setVisible(true);  
+    getPlanData(); 
+    
   };
 
-
+  const getPlanData = ()=> {
+    setLoading(true);
+    getAllUserPlans().then((data) => {
+      setPlans(data);      
+    }).catch((err) => {
+      message.error("You don't have any travel plan");
+    }).finally(() => {
+      setLoading(false);
+    });
+  }
+  /*
   const getRouteData = ()=>{
     setLoading(true);
     getAllRoutes().then((data) => {
@@ -175,7 +184,7 @@ const RouteDrawer = ({generateRoute, poiToTrip}) =>{
     }).finally(() => {
       setLoading(false);
     });
-  }
+  }*/
 
   const toggleRouteItem = (routeSeq) => {
     setLoading(true);
@@ -250,11 +259,12 @@ const RouteDrawer = ({generateRoute, poiToTrip}) =>{
     setPlans(plans.map((plan, id)=>{
       if (id.toString() !== activePlan) return plan;
       plan.routes.filter((route,rid)=>rid !== routeSeq);
+      return plan;
     }));
     if (routeId) deleteRoute(routeId);
   }
 
-  const onInputNewRouteName =(data)=>{
+  const onAddNewRoute =(data)=>{
      // console.log(data.routeName);
       setLoading(true);
       const newRoute = {
@@ -269,7 +279,7 @@ const RouteDrawer = ({generateRoute, poiToTrip}) =>{
         plan.routes.push(newRoute);
         return plan;
       }))
-      setActiveRoute(plans[activePlan].length-1);
+      setActiveRoute(plans[activePlan].routes.length-1);
       //setRouteData([...routeData, newRoute]);
       //setPoiListVisible([...routeData.map((item)=>false), true]);
       setLoading(false);
@@ -309,6 +319,16 @@ const RouteDrawer = ({generateRoute, poiToTrip}) =>{
   }
 
 
+  const onSavePlan =(selectedPlan) => {
+    setLoading(true);
+    savePlan(plans[selectedPlan]).catch((err) => {
+      message.error(err.message);
+    }).finally(() => {
+      setLoading(false);
+    });
+  }
+
+  /*
   const onSaveRoute =(route) => {
     setLoading(true);
     saveRoute(route).catch((err) => {
@@ -317,9 +337,42 @@ const RouteDrawer = ({generateRoute, poiToTrip}) =>{
       setLoading(false);
     });
   }
-
+*/
   const onPlanTabChange = (pickedPlan) => {
     setActivePlan(pickedPlan);
+  }
+  const onPlanTabEdit = (targetKey, action) => {
+    if(action==="add") {
+      addPlan();
+    } 
+    if (action === "remove") {
+      removePlan(targetKey);
+    }
+  }
+
+  const addPlan=()=>{
+    const newPlan = {
+      "id": null,
+      "name": "New tab",
+      "owner": null,
+      "routes": [],
+    }
+    setPlans([...plans,newPlan]);
+    setActivePlan((plans.length-1).toString());
+    setActiveRoute(0);
+  }
+
+  const removePlan=(key)=>{
+    setLoading(true);
+    const index = parseInt(key);
+    const planId = plans[index].planId;
+    setPlans(plans.filter((plan, id)=> id !== index));
+    if (planId) deletePlan(planId);
+    if (index > 0)
+      setActivePlan((index-1).toString());
+    else if (index < plans.length)
+      setActivePlan(index.toString());
+    setLoading(false);
   }
 
   return (
@@ -346,15 +399,16 @@ const RouteDrawer = ({generateRoute, poiToTrip}) =>{
           type="editable-card"
           onChange={onPlanTabChange}
           activeKey={activePlan}
-          //onEdit={onPlanTabEdit}
+          onEdit={onPlanTabEdit}
         >
           {plans.map((plan, id) => (
             <Tabs.TabPane 
               tab={<Input defaultValue={plan.name}/>} 
               key={id} 
-              closable={false}
+              closable={true}
             >
-              <List
+              {activePlan === id.toString() && (
+                <div> <List
                 style={{ marginTop: 0, marginLeft: 0, paddingLeft: '0px' }}
                 loading={loading}
                 dataSource={plan.routes}
@@ -381,14 +435,18 @@ const RouteDrawer = ({generateRoute, poiToTrip}) =>{
                       </Tooltip> 
                   </div>
                   <div className='poi-item'>
-                      {activeRoute == id && (<RoutePOI route={item} generateRoute={onGenerateRoute} saveRoute={onSaveRoute} updateRoute={onUpdateRoute}/>) }              
-                  </div>
-                    
+                      {activeRoute === id && (<RoutePOI route={item} generateRoute={onGenerateRoute} updateRoute={onUpdateRoute}/>) }              
+                  </div>                    
                 </List.Item>
                 )}
               />
 
-              <Button type="dashed" onClick={() => {setRouteNameModalVisible(true)}} width = '200'>
+              
+              </div>)}
+            </Tabs.TabPane>
+          ))}
+        </Tabs>
+        <Button type="dashed" onClick={() => {setRouteNameModalVisible(true)}} width = '200'>
                     Add new route
               </Button>
               <Modal 
@@ -398,7 +456,7 @@ const RouteDrawer = ({generateRoute, poiToTrip}) =>{
                 footer={[
                     <Form
                     name="route-name-input"
-                    onFinish={onInputNewRouteName}
+                    onFinish={onAddNewRoute}
                     style={{
                         width: 300,
                         margin: "auto",
@@ -417,10 +475,9 @@ const RouteDrawer = ({generateRoute, poiToTrip}) =>{
                     </Form>,]}
                 >
               </Modal>
-            </Tabs.TabPane>
-          ))}
-        </Tabs>
-       
+        <Button type="primary" onClick = {()=>onSavePlan(activePlan)} width = '80'>
+              Save Plan
+        </Button>
     </Drawer>
     </div>
     

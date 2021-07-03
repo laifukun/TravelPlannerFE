@@ -60,3 +60,42 @@ export const deleteRoute = (routeId) => {
       }
     });
   };
+
+
+  export const getAllUserPlans = () => {
+    return fetch(`/plans`).then((response) => {
+      if (response.status !== 200) {
+        throw Error("Fail to get All Routes");
+      }   
+      return response.json();
+    });
+  }; 
+
+  export const savePlan = (data) => {
+    return fetch(`/plans`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+      credentials: "include",
+    }).then((response) => {
+      if (response.status !== 201) {
+        throw Error("Fail to save route");
+      }
+    });
+  };
+
+  export const deletePlan = (planId) => {
+    return fetch(`/plans/${planId}`, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: "include",
+    }).then((response) => {
+      if (response.status !== 202) {
+        throw Error("Fail to delete route");
+      }
+    });
+  };
