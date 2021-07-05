@@ -16,11 +16,11 @@ h2{
     position: absolute;
     z-index: 10;
     margin-top: 10px;
-    margin-right: 50px;
-    padding: 10px 10px 10px 20px;
+    margin-right: 200px;
+    padding: 10px 70px 10px 20px;
     text-align: right;
     height: auto;
-    width: 100%
+    width: 100%;
 }
 
 .route-title{

@@ -124,7 +124,6 @@ function Map({initCenter, searchData, pickedPOI, routePoints, addPOItoRoute}) {
             setShowNearBy(true);              
             getNearbyPOIs();
         }
-        console.log("search data changed")
     },[searchData])
 
     const getNearbyPOIs = ()=> {

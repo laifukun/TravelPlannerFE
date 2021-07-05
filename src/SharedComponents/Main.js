@@ -135,7 +135,7 @@ function Main(props) {
 
         <Footer className="footer" style = {{paddingLeft: 0, paddingRight: 0}}>
                 ©2021 Travel Planner. All Rights Reserved. Developed by FLAG Team 2
-                <div style = {{backgroundColor: "#282c34", width: "100vw" }}>
+                <div style = {{backgroundColor: "#282c34", width: "inherit" }}>
                     <div style = {{display: "inline-block", width: "50%", textAlign: "center"}}> Contact Us: laiTeam2@gmail.com </div>
                     
                     <Button type="primary" onClick={() => showModal("stat")} style = {{width: "50%", backgroundColor: "#282c34", border: "none"}}>Privacy Statement</Button>

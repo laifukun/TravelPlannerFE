@@ -2,64 +2,13 @@ import { useEffect, useState} from "react";
 import { Button, Drawer, List, Modal, message, Input, Form, Tabs, Tooltip} from "antd";
 import {DoubleRightOutlined,MinusSquareFilled, MenuOutlined, MediumCircleFill} from "@ant-design/icons";
 import '../styles/RouteDrawer.css';
-import { getAllRoutes, deleteRoute, deletePlan, savePlan, getRouteDetailsById, getAllUserPlans } from "../Utils/routeUtils";
+import { updateRoute, deleteRoute, deletePlan, savePlan, getRouteDetailsById, getAllUserPlans, generatePlan } from "../Utils/routeUtils";
 import TextArea from "antd/lib/input/TextArea";
 import SortList from "./DragList";
 import Item from "antd/lib/list/Item";
 
 
-
-const panes = [
-  { id: 1,
-    name: 'Plan 1', 
-    routes: [{
-      name: "route1",
-      startAddress: "start 1",
-      endAddress: "end 1",
-      poiList: [ {
-        name: "poi 1",
-      }, {
-        name: "poi 2",
-      },]
-    },{
-      name: "route2",
-      startAddress: "start 2",
-      endAddress: "end 2",
-      poiList: [ {
-        name: "poi 1",
-      }, {
-        name: "poi 2",
-      },]
-    }] 
-  },
-  { id: 2,
-    name: 'Plan 2', 
-    routes: [{
-      routeId: 3,
-      name: "route3",
-      startAddress: "start 1",
-      endAddress: "end 1",
-      poiList: [ {
-        name: "poi 1",
-      }, {
-        name: "poi 2",
-      },]
-    },{
-      routeId: 4,
-      name: "route4",
-      startAddress: "start 2",
-      endAddress: "end 2",
-      poiList: [ {
-        name: "poi 1",
-      }, {
-        name: "poi 2",
-      },]
-    }] 
-  },
-];
-
-
-const RoutePOI = ({route, generateRoute, saveRoute, updateRoute})=> {
+const RoutePOI = ({route, generateRoute, updateRoute, removePOI})=> {
 
   const onChangeStartAddress=(e)=>{
     updateRoute('startAddress', e.target.value);
@@ -73,7 +22,7 @@ const RoutePOI = ({route, generateRoute, saveRoute, updateRoute})=> {
     <div style={{paddingLeft: 20, width: "100%"}}>
       <Input defaultValue={route?.startAddress} onChange={onChangeStartAddress}/>
 
-      <SortList poiData={route?.poiList} />
+      <SortList poiData={route?.poiList} removePOI={removePOI}/>
 
       <Input defaultValue={route?.endAddress}  onChange={onChangeEndAddress}/>
       <div style={{paddingTop: 20, display: 'flex', justifyContent: 'space-between'}}>
@@ -159,7 +108,8 @@ const RouteDrawer = ({generateRoute, poiToTrip}) =>{
   const onOpenDrawer = () => {
     //getRouteData(); 
     setVisible(true);  
-    getPlanData(); 
+    if (plans.length === 0 )
+      getPlanData(); 
     
   };
 
@@ -264,6 +214,24 @@ const RouteDrawer = ({generateRoute, poiToTrip}) =>{
     if (routeId) deleteRoute(routeId);
   }
 
+  const onRemovePOI= (poiSeq)=> {
+    //const routeId = plans[activePlan].routes[routeSeq].routeId;
+    //setRouteData(routeData.filter(item=>item.routeId !== routeId));
+    setPlans(plans.map((plan, id)=>{
+      if (id.toString() !== activePlan) return plan;
+      plan.routes.map((route,rId)=>{
+        if (rId === activeRoute) {
+          const poiList = route.poiList;
+          route.poiList = poiList.filter((poi, seq)=>seq !== poiSeq);
+        }
+        return route;
+      })
+      //plan.routes[activeRoute].poiList.filter((poi, seq)=>seq !== poiSeq);
+      return plan;
+    }));
+    updateRoute(plans[activePlan].routes[activeRoute]);
+  }
+
   const onAddNewRoute =(data)=>{
      // console.log(data.routeName);
       setLoading(true);
@@ -357,8 +325,16 @@ const RouteDrawer = ({generateRoute, poiToTrip}) =>{
       "owner": null,
       "routes": [],
     }
+    const newRoute = {
+      "id": null,
+      "name": "new Route",
+      "startAddress": "",
+      "endAddress": "",
+      "poiList": [],
+    };
+    const planLen = plans.length;
     setPlans([...plans,newPlan]);
-    setActivePlan((plans.length-1).toString());
+    setActivePlan(planLen.toString());
     setActiveRoute(0);
   }
 
@@ -375,11 +351,30 @@ const RouteDrawer = ({generateRoute, poiToTrip}) =>{
     setLoading(false);
   }
 
+  const onGeneratePlan = ()=> {
+    if (activePlan) {
+      generatePlan(plans[parseInt(activePlan)]).then((data) => {
+        setPlans(plans.map((plan, id)=>{
+          if (id.toString() == activePlan) return data;
+          return plan;
+        }));      
+      }).catch((err) => {
+        message.error("Failed to generate plan");
+      }).finally(() => {
+        setLoading(false);
+      });
+    } else {
+      message.error("You don't select a plan");
+    }
+    
+
+  }
+
   return (
-    <div>
+    <>
       <div className ='route-position'> 
         <Button type="primary" onClick={onOpenDrawer} size="medium">
-          Route
+          Your Travel Plans
         </Button>
       </div>
       <Drawer
@@ -435,7 +430,11 @@ const RouteDrawer = ({generateRoute, poiToTrip}) =>{
                       </Tooltip> 
                   </div>
                   <div className='poi-item'>
-                      {activeRoute === id && (<RoutePOI route={item} generateRoute={onGenerateRoute} updateRoute={onUpdateRoute}/>) }              
+                      {activeRoute === id && (<RoutePOI 
+                                route={item} 
+                                generateRoute={onGenerateRoute} 
+                                updateRoute={onUpdateRoute}
+                                removePOI={seq => onRemovePOI(seq)}/>) }              
                   </div>                    
                 </List.Item>
                 )}
@@ -447,7 +446,7 @@ const RouteDrawer = ({generateRoute, poiToTrip}) =>{
           ))}
         </Tabs>
         <Button type="dashed" onClick={() => {setRouteNameModalVisible(true)}} width = '200'>
-                    Add new route
+                    Add new route manually
               </Button>
               <Modal 
                 title ="Input route name"
@@ -478,8 +477,12 @@ const RouteDrawer = ({generateRoute, poiToTrip}) =>{
         <Button type="primary" onClick = {()=>onSavePlan(activePlan)} width = '80'>
               Save Plan
         </Button>
+
+        <Button type="primary" onClick ={onGeneratePlan} witdh ='100'>
+          Generate Plan Automatically
+        </Button>
     </Drawer>
-    </div>
+    </>
     
   )
 }

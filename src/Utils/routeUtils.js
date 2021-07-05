@@ -47,7 +47,7 @@ export const deleteRoute = (routeId) => {
   };
 
   export const updateRoute = (data) => {
-    return fetch(`/routes}`, {
+    return fetch(`/routes`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -97,5 +97,21 @@ export const deleteRoute = (routeId) => {
       if (response.status !== 202) {
         throw Error("Fail to delete route");
       }
+    });
+  };
+
+  export const generatePlan = (data) => {
+    return fetch(`/plans/generate/1`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+      credentials: "include",
+    }).then((response) => {
+      if (response.status !== 200) {
+        throw Error("Fail to generate plan");
+      }
+      return response.json();
     });
   };

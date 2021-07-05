@@ -12,16 +12,12 @@ const { Panel } = Collapse;
 
 const DragHandle = sortableHandle(() => <MenuOutlined style={{ cursor: 'grab', color: '#999' }}/>);
 
-const SortableItem = sortableElement(({ value }) => (
+const SortableItem = sortableElement(({ poi }) => (
 
-      <div className='poi-item'>
-        <div> <DragHandle /> {value.name} </div>
+      <div >
+        <div> <DragHandle /> {poi.name} </div>
         
-        <Button
-          type="primary"
-          icon={<MinusOutlined />}
-                 // onClick={onRemoveRoute(item.routeId)}
-        />
+        
       </div>
 
 ));
@@ -39,7 +35,7 @@ const SortableContainer = sortableContainer(({ children }) => {
   );
 });
 
-export default function SortList({poiData}) {
+export default function SortList({poiData, removePOI}) {
   const [data, setData] = useState(poiData);
 
   
@@ -58,8 +54,16 @@ export default function SortList({poiData}) {
 
   return (
     <SortableContainer onSortEnd={onSortEnd} useDragHandle >
-      {data?.map((value, index) => {
-        return (<SortableItem key={`item-${index}`} index={index} value={value} />)
+      {data?.map((poi, index) => {
+        return (
+        <div className='poi-item'> 
+          <SortableItem key={`item-${index}`} index={index} poi={poi} />
+          <Button
+            type="primary"
+            icon={<MinusOutlined />}
+            onClick={()=>removePOI(index)}
+          />
+        </div>)
       })}
     </SortableContainer>
   );
