@@ -1,11 +1,11 @@
 import React, { useState, useEffect} from "react";
-import { GoogleMap, useLoadScript, Marker, InfoWindow, DirectionsService, DirectionsRenderer } from "@react-google-maps/api";
+import { GoogleMap, useLoadScript, Marker, InfoWindow, DirectionsService, DirectionsRenderer, Circle } from "@react-google-maps/api";
 import * as POIData from "./POI-data-test.json";
 import mapStyles from "../styles/mapStyles";
 import PropTypes from 'prop-types'
 import {searchByRange} from '../Utils/searchUtils';
 import "../styles/Map.css"
-import { Button, Image, Card, message } from "antd";
+import { Button, Image, Card, message, Rate } from "antd";
 
 
 const libraries = ["places"];
@@ -232,6 +232,7 @@ function Map({initCenter, searchData, pickedPOI, routePoints, addPOItoRoute}) {
                                 className="info-image"
                              />
                              <div className="card-button">
+                             <Rate disabled allowHalf value={selectedPOI.popularity / 2} />
                              <Card title ={selectedPOI.name} bodyStyle={{paddingTop: 0, paddingBottom: 0}}>
                                 {selectedPOI.description}                                
                              </Card>
@@ -251,7 +252,12 @@ function Map({initCenter, searchData, pickedPOI, routePoints, addPOItoRoute}) {
                 )}
 
                 {response !== null && (
-                    <DirectionsRenderer options={{directions: response}} />
+                    <DirectionsRenderer 
+                        options={{directions: response}} 
+                        Marker = {
+                            {opacity: 0.3}
+                        }
+                    />
                 )}
 
             </GoogleMap>
