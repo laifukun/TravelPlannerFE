@@ -45,6 +45,20 @@ export const deleteRoute = (routeId) => {
       }
     });
   };
+  export const deletePOIFromRoute = (data) => {
+    return fetch(`/routes/pois`, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+      credentials: "include",
+    }).then((response) => {
+      if (response.status !== 202) {
+        throw Error("Fail to delete poi from route");
+      }
+    });
+  };
 
   export const updateRoute = (data) => {
     return fetch(`/routes`, {
@@ -81,8 +95,25 @@ export const deleteRoute = (routeId) => {
       credentials: "include",
     }).then((response) => {
       if (response.status !== 201) {
+        throw Error("Fail to save plan");
+      }
+      return response.json();
+    });
+  };
+
+  export const updatePlan = (data) => {
+    return fetch(`/plans`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+      credentials: "include",
+    }).then((response) => {
+      if (response.status !== 202) {
         throw Error("Fail to save route");
       }
+      return response.json();
     });
   };
 
@@ -100,8 +131,8 @@ export const deleteRoute = (routeId) => {
     });
   };
 
-  export const generatePlan = (data) => {
-    return fetch(`/plans/generate/1`, {
+  export const generatePlan = (data, maxHour) => {
+    return fetch(`/plans/generate/${maxHour}`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

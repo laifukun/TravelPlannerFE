@@ -3,6 +3,7 @@ import {Input, message} from 'antd';
 import '../styles/Search.css';
 import SearchResult from './SearchResult';
 import {searchByKeyword} from '../Utils/searchUtils';
+import { SearchOutlined } from '@ant-design/icons';
 const {Search} = Input;
 
 
@@ -41,7 +42,7 @@ const KeywordSearch = ({loadSearchResult, loadSelectedPOI}) => {
                 enterButton="Search"
                 size="medium"
                 onSearch={onSearch}
-                
+                icon={<SearchOutlined />}                
             />
             </div>
             <SearchResult 

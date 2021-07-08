@@ -1,6 +1,6 @@
 import { Button, Form, Input, message, Modal } from "antd";
 import React, {useState} from "react";
-import {LockOutlined, UserOutlined } from "@ant-design/icons";
+import {LockOutlined, UserOutlined, LoginOutlined} from "@ant-design/icons";
 import { login } from "../Utils/userUtils";
 
 function LoginForm({onLoginSuccess}) {
@@ -30,7 +30,7 @@ function LoginForm({onLoginSuccess}) {
 
     return (
         <>
-        <Button type="primary" htmlType="submit" onClick={()=>setVisible(true)}>
+        <Button type="primary" htmlType="submit" onClick={()=>setVisible(true)} icon={<LoginOutlined />}>
             Login
         </Button>
         <Modal 

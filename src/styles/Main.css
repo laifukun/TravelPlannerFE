@@ -46,6 +46,8 @@
   background-color:#282c34;
   text-align: center;
   color: white;
+  display: flex;
+  justify-content: space-between;
 }
 
 .welcome {

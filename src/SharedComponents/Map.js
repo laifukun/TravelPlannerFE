@@ -1,11 +1,11 @@
 import React, { useState, useEffect} from "react";
 import { GoogleMap, useLoadScript, Marker, InfoWindow, DirectionsService, DirectionsRenderer, Circle } from "@react-google-maps/api";
-import * as POIData from "./POI-data-test.json";
 import mapStyles from "../styles/mapStyles";
 import PropTypes from 'prop-types'
 import {searchByRange} from '../Utils/searchUtils';
 import "../styles/Map.css"
 import { Button, Image, Card, message, Rate } from "antd";
+import {haversine_distance} from '../Utils/others'
 
 
 const libraries = ["places"];
@@ -30,24 +30,20 @@ const DirectionsPropTypes = {
 }
 
 
-function Map({initCenter, searchData, pickedPOI, routePoints, addPOItoRoute}) {
+function Map({initCenter, searchData, pickedPOI, routePoints, addPOItoRoute, loadRouteDetails}) {
 
     const mapRef = React.useRef();
     const[selectedPOI, setSelectedPOI] = useState(null);
     const[center, setCenter] = useState();
     const[showNearBy, setShowNearBy] = useState(true);
-
     const [POIData, setPOIData] = useState([]);
     const [loading, setLoading] = useState(false);
-
     const { isLoaded, loadError } = useLoadScript({
         googleMapsApiKey: process.env.REACT_APP_GOOGLEMAP_API,
         libraries,
     });
-
     const [response, setResponse] = useState(null)
     const [directionReq, setDirectionReq]=useState(null);
-
 
     function handleLoad(map) {
         mapRef.current = map;
@@ -57,8 +53,6 @@ function Map({initCenter, searchData, pickedPOI, routePoints, addPOItoRoute}) {
         if (!mapRef.current) return;
 
     }
-
-
 
     useEffect(()=>{
         if (!center){
@@ -81,11 +75,18 @@ function Map({initCenter, searchData, pickedPOI, routePoints, addPOItoRoute}) {
         if(routePoints) {
             onGenerateRoute(routePoints);
             setShowNearBy(false);
-            setPOIData(routePoints.poiList);
+            setPOIData([]);
+            //setPOIData(routePoints.poiList);
         } else {
-            setShowNearBy(true);
+            if (searchData.length !== 0) {
+                setPOIData(searchData);                
+            } else {
+                setShowNearBy(true);
+                getNearbyPOIs();
+            }            
             onClearRouteRender();
-            getNearbyPOIs();
+            setSelectedPOI(null);
+            
         }
     }, [routePoints])
 
@@ -117,10 +118,13 @@ function Map({initCenter, searchData, pickedPOI, routePoints, addPOItoRoute}) {
     }
 
     useEffect( ()=> {
+
         if(searchData.length !== 0) {
             setPOIData(searchData);
             setShowNearBy(false);
-        } else {         
+            onClearRouteRender();
+            setSelectedPOI(null);
+        } else if (routePoints===null) {         
             setShowNearBy(true);              
             getNearbyPOIs();
         }
@@ -146,29 +150,35 @@ function Map({initCenter, searchData, pickedPOI, routePoints, addPOItoRoute}) {
             });
     }
 
-    function haversine_distance(p1, p2) {
-        var R = 6371; // Radius of the Earth in kms
-        var rlat1 = p1.lat * (Math.PI/180); // Convert degrees to radians
-        var rlat2 = p2.lat * (Math.PI/180); // Convert degrees to radians
-        var difflat = rlat2-rlat1; // Radian difference (latitudes)
-        var difflon = (p2.lng-p1.lng) * (Math.PI/180); // Radian difference (longitudes)
-  
-        var d = 2 * R * Math.asin(Math.sqrt(Math.sin(difflat/2)*Math.sin(difflat/2)+Math.cos(rlat1)*Math.cos(rlat2)*Math.sin(difflon/2)*Math.sin(difflon/2)));
-        return d;
-      }
 
+    
     const directionsCallback = React.useCallback((res) => {
         console.log(res)
 
         if (res !== null) {
             if (res.status === 'OK') {
                 setResponse(res)
+                
+            } else {
+                console.log('response: ', res)
+            }
+            loadRouteDetails(res.routes[0].legs);
+        }
+    }, [])
+/*
+    const directionsCallback = (res)=>{
+        console.log(res)
+
+        if (res !== null) {
+            if (res.status === 'OK') {
+                setResponse(res)
+                loadRouteDetails(res.routes[0].legs);
             } else {
                 console.log('response: ', res)
             }
         }
-    }, [])
-
+    }
+    */
     //let directionsRendererOptions = {
     //    directions: response,
     //}
@@ -232,8 +242,9 @@ function Map({initCenter, searchData, pickedPOI, routePoints, addPOItoRoute}) {
                                 className="info-image"
                              />
                              <div className="card-button">
-                             <Rate disabled allowHalf value={selectedPOI.popularity / 2} />
-                             <Card title ={selectedPOI.name} bodyStyle={{paddingTop: 0, paddingBottom: 0}}>
+                             
+                             <Card title ={(<div>{selectedPOI.name} <Rate disabled allowHalf value={selectedPOI.popularity / 2} /></div>)} 
+                             bodyStyle={{paddingTop: 0, paddingBottom: 0}}>
                                 {selectedPOI.description}                                
                              </Card>
                              <Button type="primary" htmlType="submit" onClick={()=>onAddPOItoRoute(selectedPOI)}>

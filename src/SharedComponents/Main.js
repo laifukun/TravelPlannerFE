@@ -20,7 +20,8 @@ function Main(props) {
     const [searchResults, setSearchResults] = useState([]);
     const [pickedPOI, setPickedPOI] = useState();
     const [user, setUser] =useState();
-    const [route, setRoute] = useState();
+    const [routePoints, setRoutePoints] = useState();
+    const [routeDetails, setRouteDetails] = useState();
     const [poiToTrip, setPoiToTrip] = useState();
     const [isStatVisible, setIsStatVisible] = useState(false);
     const [isStaffVisible, setIsStaffVisible] = useState(false);
@@ -35,10 +36,11 @@ function Main(props) {
     const onLoginSuccess = (username) => {        
         getUserInfo(username).then((data)=> {
             setUser(data);
+            setAuthed(true);
         }).catch((err) => {
             message.error(err.message);
         }).finally(()=>{
-            setAuthed(true);
+            
         });   
 
         /*
@@ -119,32 +121,35 @@ function Main(props) {
                     loadSelectedPOI={ (item)=>setPickedPOI(item) }
                 />
                 <RouteDrawer 
-                    generateRoute={(data)=>setRoute(data)}
+                    generateRoute={(points)=>setRoutePoints(points)}
                     poiToTrip = {poiToTrip}
+                    routeDetails={routeDetails}
+                    authed = {authed}
                 />
                 <Map 
                     initCenter ={initCenter} 
                     searchData = {searchResults} 
                     pickedPOI={pickedPOI} 
-                    routePoints={route}
+                    routePoints={routePoints}
                     addPOItoRoute={(poi)=>setPoiToTrip(poi)}
+                    loadRouteDetails={(details)=>setRouteDetails(details)}
                 />
                 
             </div>
         </ Content>
 
-        <Footer className="footer" style = {{paddingLeft: 0, paddingRight: 0}}>
-                ©2021 Travel Planner. All Rights Reserved. Developed by FLAG Team 2
-                <div style = {{backgroundColor: "#282c34", width: "inherit" }}>
-                    <div style = {{display: "inline-block", width: "50%", textAlign: "center"}}> Contact Us: laiTeam2@gmail.com </div>
-                    
-                    <Button type="primary" onClick={() => showModal("stat")} style = {{width: "50%", backgroundColor: "#282c34", border: "none"}}>Privacy Statement</Button>
+        <Footer className="footer" style = {{paddingLeft: 100, paddingRight: 0}}>
+                <div>©2021 Travel Planner. All Rights Reserved. Developed by FLAG Team 2</div>
+                <div style = {{backgroundColor: "#282c34", width: "30%", display: 'flex' }}>
+                    <span style = {{ textAlign: "center"}}> Contact us: laiTeam2@gmail.com </span>
+                    <span>
+                    <Button type="primary" size='small'  onClick={() => showModal("stat") } style = {{ backgroundColor: "#282c34", border: "none"}}>Privacy Statement</Button>
                     <Modal visible={isStatVisible} onOk={() => handleOk("stat")} onCancel={() => handleCancel("stat")} style = {{width: "50%"}}>
                     This Privacy Policy explains how TravelPlanner ( “we”or “us”) collects, uses, and discloses information about you. This Privacy Policy applies when you use our websites, mobile applications, and other online products and services that link to this Privacy Policy (collectively, our “Services”), contact our customer service team, engage with us on social media, or otherwise interact with us.
                     We may change this Privacy Policy from time to time. If we make changes, we will notify you by revising the date at the top of this policy and, in some cases, we may provide you with additional notice (such as adding a statement to our website or providing you with a notification). We encourage you to review this Privacy Policy regularly to stay informed about our information practices and the choices available to you.
                     </Modal>
                 
-                    <Button type="primary" onClick={() => showModal("staff")} style = {{width: "50%", backgroundColor: "#282c34", border: "none"}}>Staff</Button>
+                    <Button type="primary" size='small' onClick={() => showModal("staff")} style = {{ backgroundColor: "#282c34", border: "none"}}>Staff</Button>
                     <Modal visible={isStaffVisible} onOk={() => handleOk("staff")} onCancel={() => handleCancel("staff")} style = {{width: "50%"}}>
                     Fukun Lai;
                     Zheng Xie;
@@ -155,10 +160,11 @@ function Main(props) {
                     Songjian Li
                     </Modal>
                     
-                    <Button type="primary" onClick={() => showModal("about")} style = {{width: "50%", backgroundColor: "#282c34", border: "none"}}>About Us</Button>
+                    <Button type="primary" size='small' onClick={() => showModal("about")} style = {{ backgroundColor: "#282c34", border: "none"}}>About Us</Button>
                     <Modal visible={isModalVisible} onOk={() => handleOk("about")} onCancel={() => handleCancel("about")} style = {{width: "50%"}}>
                     Most often, people have some rough ideas of the locations/attractions they want to visit, but they normally have no clear idea how to plan their trip to best suit their schedule and interest. The intent of a travel planner is to provide a tool to fill this gap. Users are able to arrange and plan their trip with travel planner according to their schedule and interest.
                     </Modal>
+                    </span>
                 </div>
         </Footer>
     </Layout>

@@ -1,6 +1,6 @@
 import { Button, Form, Input, message, Modal } from "antd";
 import { useState } from "react";
-import {LockOutlined, UserOutlined } from "@ant-design/icons";
+import {LockOutlined, UserOutlined, UserAddOutlined} from "@ant-design/icons";
 import { register } from "../Utils/userUtils";
 
 const RegistrationForm = ({onSuccess}) => {
@@ -31,7 +31,7 @@ const RegistrationForm = ({onSuccess}) => {
     }
     return (
         <>
-        <Button type="primary" htmlType="submit" onClick={()=>setVisible(true)}>
+        <Button type="primary" onClick={()=>setVisible(true)} icon={<UserAddOutlined />}>
             Register
         </Button>
 

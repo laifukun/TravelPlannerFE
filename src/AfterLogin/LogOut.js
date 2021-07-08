@@ -1,9 +1,10 @@
+import { LogoutOutlined } from "@ant-design/icons";
 import { Button, message, Modal } from "antd";
 import React, {useState} from "react";
 import { logout } from "../Utils/userUtils";
 
 function Logout({onLogoutSuccess}) {
-    const [loading, setLoading] = useState(false);
+    //const [loading, setLoading] = useState(false);
     const [visible, setVisible] = useState(false);
 
   
@@ -14,7 +15,7 @@ function Logout({onLogoutSuccess}) {
         }).catch((err) => {
             message.error(err.message);
         }).finally(() => {
-            setLoading(false);
+          //  setLoading(false);
             setVisible(false);
         });
     };
@@ -25,7 +26,7 @@ function Logout({onLogoutSuccess}) {
 
     return (
         <>     
-        <Button type="primary" htmlType="submit" onClick={()=>setVisible(true)}>
+        <Button type="primary" htmlType="submit" onClick={()=>setVisible(true)} icon={<LogoutOutlined />}>
             Logout
         </Button>   
         <Modal 
