@@ -6,6 +6,7 @@ import {searchByRange} from '../Utils/searchUtils';
 import "../styles/Map.css"
 import { Button, Image, Card, message, Rate } from "antd";
 import {haversine_distance} from '../Utils/others'
+import { CoffeeOutlined } from "@ant-design/icons";
 
 
 const libraries = ["places"];
@@ -122,7 +123,7 @@ function Map({initCenter, searchData, pickedPOI, routePoints, addPOItoRoute, loa
         if(searchData.length !== 0) {
             setPOIData(searchData);
             setShowNearBy(false);
-            onClearRouteRender();
+            //onClearRouteRender();
             setSelectedPOI(null);
         } else if (routePoints===null) {         
             setShowNearBy(true);              
@@ -209,6 +210,8 @@ function Map({initCenter, searchData, pickedPOI, routePoints, addPOItoRoute, loa
                 
                 {POIData.map(POI => (
                     <Marker
+                        title={POI.name}
+                        lable={POI.name}
                         key = {POI.poiId}
                         position = {{
                             lat: POI.lat,
@@ -218,7 +221,7 @@ function Map({initCenter, searchData, pickedPOI, routePoints, addPOItoRoute, loa
                             onSelectPOI(POI);
                         }}
                         icon = {{
-                            url: POI.imageUrl,
+                            url: POI.imageUrl? POI.imageUrl : (<CoffeeOutlined />), 
                             scaledSize: new window.google.maps.Size(40, 40)
                         }}
                         style={{zIndex: 30}}

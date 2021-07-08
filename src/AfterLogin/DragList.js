@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { RightOutlined, DragOutlined, MinusOutlined} from "@ant-design/icons";
+import { StarFilled, HomeFilled, MinusOutlined} from "@ant-design/icons";
 import {Collapse, Button, Tooltip} from "antd"
 import {
   sortableContainer,
@@ -11,7 +11,7 @@ import '../styles/RouteDrawer.css';
 import DeleteButton from "../SharedComponents/DeleteButton";
 const { Panel } = Collapse;
 
-const DragHandle = sortableHandle(({value}) => <Button type='text' icon ={<DragOutlined/>} style={{padding: 0, cursor: 'move'}}
+const DragHandle = sortableHandle(({value}) => <Button type='text' icon ={<StarFilled/>} style={{padding: 0, cursor: 'move'}}
 >{value}</Button>);
 
 const SortableItem = sortableElement(({ poi }) => (

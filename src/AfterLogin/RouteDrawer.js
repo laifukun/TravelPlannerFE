@@ -1,14 +1,15 @@
 import { useEffect, useState} from "react";
 import { Button, Drawer, List, Form, message, Input, InputNumber, Tabs, Tooltip} from "antd";
-import {DeleteOutlined,  MenuFoldOutlined, MenuUnfoldOutlined, SaveOutlined, PlusOutlined, CloseOutlined, NodeIndexOutlined} from "@ant-design/icons";
+import {DeleteOutlined,  MenuFoldOutlined, MenuUnfoldOutlined, SaveOutlined, PlusOutlined, CloseOutlined, NodeIndexOutlined, HomeFilled, ClearOutlined} from "@ant-design/icons";
 import '../styles/RouteDrawer.css';
 import { deletePOIFromRoute, deleteRoute, deletePlan, savePlan, updatePlan, getRouteDetailsById, getAllUserPlans, generatePlan } from "../Utils/routeUtils";
+import {searchNearbyRestaurant} from "../Utils/searchUtils"
 import SortList from "./DragList";
 import TitleEditorModal from "./TitleEditorModal"
 import DeleteButton from "../SharedComponents/DeleteButton";
 
 
-const RoutePOI = ({route, generateRoute, updateRoute, removePOI, routeDetails, loadSortedPOI})=> {
+const RoutePOI = ({route, generateRoute, updateRoute, removePOI, routeDetails, loadSortedPOI, showNearbyFood})=> {
 
   const onChangeStartAddress=(e)=>{
     updateRoute('startAddress', e.target.value);
@@ -20,15 +21,29 @@ const RoutePOI = ({route, generateRoute, updateRoute, removePOI, routeDetails, l
 
   return (
     <div style={{paddingLeft: 20, width: "100%"}}>
-      <Input defaultValue={route?.startAddress} onChange={onChangeStartAddress}/>
+      <Tooltip title="From" > 
+        <div style={{display: 'flex', justifyContent: 'space-between', alignItems:'center'}}>
+          <HomeFilled /> <Input defaultValue={route?.startAddress} onChange={onChangeStartAddress}/>
+        </div>
+      </Tooltip>
 
       <SortList poiData={route?.poiList} removePOI={removePOI} routeInfo={routeDetails} loadSortedData={loadSortedPOI}/>
+      <Tooltip title="To" > 
+        <div style={{display: 'flex', justifyContent: 'space-between', alignItems:'center'}}>
+        <HomeFilled /><Input defaultValue={route?.endAddress}  onChange={onChangeEndAddress}/>
+        </div>
+      </Tooltip>
 
-      <Input defaultValue={route?.endAddress}  onChange={onChangeEndAddress}/>
       <div style={{paddingTop: 20, display: 'flex', justifyContent: 'space-between'}}>
         <Button type="primary" onClick={()=>generateRoute(route)} width = '100' icon={<NodeIndexOutlined />}>
-              Generate Route
-        </Button>        
+              Generate
+        </Button>   
+        <Button type="primary" onClick={()=>generateRoute(null)} width = '100' icon={<ClearOutlined />}>
+              Clear
+        </Button>    
+        <Button type="primary" onClick={()=>showNearbyFood(route)} width = '100' icon={<img src='/food-icon.png'></img>}>
+              Nearby Food
+        </Button>   
       </div>
       
     </div>
@@ -36,7 +51,7 @@ const RoutePOI = ({route, generateRoute, updateRoute, removePOI, routeDetails, l
 
 }
 
-const RouteDrawer = ({generateRoute, poiToTrip, routeDetails, authed}) =>{
+const RouteDrawer = ({generateRoute, showNearbyRest, poiToTrip, routeDetails, authed}) =>{
   const [visible, setVisible] = useState(false);
   const [loading, setLoading] = useState(false);
   const [routeExpand, setRouteExpand] = useState(false);
@@ -47,6 +62,7 @@ const RouteDrawer = ({generateRoute, poiToTrip, routeDetails, authed}) =>{
 
   useEffect(()=>{
     if (poiToTrip) {
+      setRouteInfo(null);
       setPlans(plans.map(
         (plan, id)=>{
         if (activePlan !== id.toString()) return plan;
@@ -114,6 +130,17 @@ const RouteDrawer = ({generateRoute, poiToTrip, routeDetails, authed}) =>{
       setPlans(data);      
     }).catch((err) => {
       message.error("You don't have any travel plan");
+    }).finally(() => {
+      setLoading(false);
+    });
+  }
+
+  const getRouteRestaurant = (route) =>{
+    setLoading(true);
+    searchNearbyRestaurant(route).then((data) => {
+      showNearbyRest(data);      
+    }).catch((err) => {
+      message.error("Fail to get restaurant");
     }).finally(() => {
       setLoading(false);
     });
@@ -524,7 +551,10 @@ const RouteDrawer = ({generateRoute, poiToTrip, routeDetails, authed}) =>{
                                 updateRoute={onUpdateRouteField}
                                 removePOI={seq => onRemovePOI(seq)}
                                 routeDetails={routeInfo}
-                                loadSortedPOI={(newList)=>onChangePOIOrder(newList)}/>) }              
+                                loadSortedPOI={(newList)=>onChangePOIOrder(newList)}
+                                showNearbyFood={(route)=>getRouteRestaurant(route) }  
+                                />)}
+                                            
                   </div>                    
                 </List.Item>
                 )}

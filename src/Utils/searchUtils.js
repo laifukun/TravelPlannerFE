@@ -16,4 +16,19 @@ export const searchByKeyword = (keyword) => {
     });
   };
 
+  export const searchNearbyRestaurant = (route) => {
+    return fetch(`/search/route/restaurants`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(route),
+      credentials: "include",
+    }).then((response) => {
+      if (response.status !== 200) {
+        throw Error("Fail to get restaurant");
+      }
+      return response.json();
+    });
+  };
 

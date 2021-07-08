@@ -125,6 +125,7 @@ function Main(props) {
                     poiToTrip = {poiToTrip}
                     routeDetails={routeDetails}
                     authed = {authed}
+                    showNearbyRest={(data)=>setSearchResults(data)}
                 />
                 <Map 
                     initCenter ={initCenter} 
