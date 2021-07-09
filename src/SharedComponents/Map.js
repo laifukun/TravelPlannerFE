@@ -7,6 +7,8 @@ import "../styles/Map.css"
 import { Button, Image, Card, message, Rate } from "antd";
 import {haversine_distance} from '../Utils/others'
 import { CoffeeOutlined } from "@ant-design/icons";
+import {ImSpoonKnife} from 'react-icons/im'
+import foodIcon from "../asset/food-icon2.png"
 
 
 const libraries = ["places"];
@@ -38,6 +40,7 @@ function Map({initCenter, searchData, pickedPOI, routePoints, addPOItoRoute, loa
     const[center, setCenter] = useState();
     const[showNearBy, setShowNearBy] = useState(true);
     const [POIData, setPOIData] = useState([]);
+    const [PlaceData, setPlaceData] = useState([]);
     const [loading, setLoading] = useState(false);
     const { isLoaded, loadError } = useLoadScript({
         googleMapsApiKey: process.env.REACT_APP_GOOGLEMAP_API,
@@ -220,11 +223,15 @@ function Map({initCenter, searchData, pickedPOI, routePoints, addPOItoRoute, loa
                         onClick={() => {
                             onSelectPOI(POI);
                         }}
-                        icon = {{
-                            url: POI.imageUrl? POI.imageUrl : (<CoffeeOutlined />), 
-                            scaledSize: new window.google.maps.Size(40, 40)
+                        //icon={<ImSpoonKnife />}
+                        
+                        icon = {POI.imageUrl === "" ? (<ImSpoonKnife />): {
+                            url: POI.imageUrl, 
+                            scaledSize: new window.google.maps.Size(18, 18),
+                            style: {background: 'red', border: '5px'},
                         }}
-                        style={{zIndex: 30}}
+                        
+                        style={{zIndex: 30, border: '5px', borderStyle: 'solid', backgroundColor: 'red'}}
                     />
                 ))}
 

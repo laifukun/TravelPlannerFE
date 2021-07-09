@@ -11,7 +11,7 @@ const KeywordSearch = ({loadSearchResult, loadSelectedPOI}) => {
     const [loading, setLoading] = useState(false);
     const [results, setResults] = useState();
     const [resultVisible, setResultVisible] = useState(false);
-   // const [showResult, setShowResult] = useState(false);
+
     const onSearch = (keyword) => {
         setLoading(true);
         searchByKeyword(keyword).then((data) => {
@@ -37,7 +37,7 @@ const KeywordSearch = ({loadSearchResult, loadSelectedPOI}) => {
         <>
             <div className='search-input'>
              <Search
-                placeholder="input keyword"
+                placeholder="Search POI"
                 loading={loading}
                 enterButton="Search"
                 size="medium"

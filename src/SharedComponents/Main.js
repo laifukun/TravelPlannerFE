@@ -125,7 +125,7 @@ function Main(props) {
                     poiToTrip = {poiToTrip}
                     routeDetails={routeDetails}
                     authed = {authed}
-                    showNearbyRest={(data)=>setSearchResults(data)}
+                    showNearbyPlaces={(data)=>setSearchResults(data)}
                 />
                 <Map 
                     initCenter ={initCenter} 
@@ -145,13 +145,13 @@ function Main(props) {
                     <span style = {{ textAlign: "center"}}> Contact us: laiTeam2@gmail.com </span>
                     <span>
                     <Button type="primary" size='small'  onClick={() => showModal("stat") } style = {{ backgroundColor: "#282c34", border: "none"}}>Privacy Statement</Button>
-                    <Modal visible={isStatVisible} onOk={() => handleOk("stat")} onCancel={() => handleCancel("stat")} style = {{width: "50%"}}>
+                    <Modal title="Privacy Statement" visible={isStatVisible} onOk={() => handleOk("stat")} onCancel={() => handleCancel("stat")} style = {{width: "50%"}}>
                     This Privacy Policy explains how TravelPlanner ( “we”or “us”) collects, uses, and discloses information about you. This Privacy Policy applies when you use our websites, mobile applications, and other online products and services that link to this Privacy Policy (collectively, our “Services”), contact our customer service team, engage with us on social media, or otherwise interact with us.
                     We may change this Privacy Policy from time to time. If we make changes, we will notify you by revising the date at the top of this policy and, in some cases, we may provide you with additional notice (such as adding a statement to our website or providing you with a notification). We encourage you to review this Privacy Policy regularly to stay informed about our information practices and the choices available to you.
                     </Modal>
                 
-                    <Button type="primary" size='small' onClick={() => showModal("staff")} style = {{ backgroundColor: "#282c34", border: "none"}}>Staff</Button>
-                    <Modal visible={isStaffVisible} onOk={() => handleOk("staff")} onCancel={() => handleCancel("staff")} style = {{width: "50%"}}>
+                    <Button title = "Team" type="primary" size='small' onClick={() => showModal("staff")} style = {{ backgroundColor: "#282c34", border: "none"}}>Team</Button>
+                    <Modal title = "Team" visible={isStaffVisible} onOk={() => handleOk("staff")} onCancel={() => handleCancel("staff")} style = {{width: "50%"}}>
                     Fukun Lai;
                     Zheng Xie;
                     Chong Xu;
@@ -162,7 +162,7 @@ function Main(props) {
                     </Modal>
                     
                     <Button type="primary" size='small' onClick={() => showModal("about")} style = {{ backgroundColor: "#282c34", border: "none"}}>About Us</Button>
-                    <Modal visible={isModalVisible} onOk={() => handleOk("about")} onCancel={() => handleCancel("about")} style = {{width: "50%"}}>
+                    <Modal title = "About us"  visible={isModalVisible} onOk={() => handleOk("about")} onCancel={() => handleCancel("about")} style = {{width: "50%"}}>
                     Most often, people have some rough ideas of the locations/attractions they want to visit, but they normally have no clear idea how to plan their trip to best suit their schedule and interest. The intent of a travel planner is to provide a tool to fill this gap. Users are able to arrange and plan their trip with travel planner according to their schedule and interest.
                     </Modal>
                     </span>

@@ -1,15 +1,19 @@
 import { useEffect, useState} from "react";
 import { Button, Drawer, List, Form, message, Input, InputNumber, Tabs, Tooltip} from "antd";
-import {DeleteOutlined,  MenuFoldOutlined, MenuUnfoldOutlined, SaveOutlined, PlusOutlined, CloseOutlined, NodeIndexOutlined, HomeFilled, ClearOutlined} from "@ant-design/icons";
+import {DeleteFilled,  MenuFoldOutlined, MenuUnfoldOutlined, SaveOutlined, PlusOutlined, NodeIndexOutlined, HomeFilled, ClearOutlined, CloseOutlined} from "@ant-design/icons";
 import '../styles/RouteDrawer.css';
 import { deletePOIFromRoute, deleteRoute, deletePlan, savePlan, updatePlan, getRouteDetailsById, getAllUserPlans, generatePlan } from "../Utils/routeUtils";
-import {searchNearbyRestaurant} from "../Utils/searchUtils"
+import {searchNearbyPlaces} from "../Utils/searchUtils"
 import SortList from "./DragList";
 import TitleEditorModal from "./TitleEditorModal"
 import DeleteButton from "../SharedComponents/DeleteButton";
+import {ImSpoonKnife} from 'react-icons/im'
+import {MdHotel} from 'react-icons/md'
+import {GrClose, GrOptimize} from 'react-icons/gr'
+import {GiJourney} from 'react-icons/gi'
 
+const RoutePOI = ({route, generateRoute, updateRoute, removePOI, routeDetails, loadSortedPOI, showNearbyFood, showNearbyHotel})=> {
 
-const RoutePOI = ({route, generateRoute, updateRoute, removePOI, routeDetails, loadSortedPOI, showNearbyFood})=> {
 
   const onChangeStartAddress=(e)=>{
     updateRoute('startAddress', e.target.value);
@@ -19,31 +23,62 @@ const RoutePOI = ({route, generateRoute, updateRoute, removePOI, routeDetails, l
     updateRoute('endAddress', e.target.value);
   }
 
+  const getTotalTravelTime = () =>{
+    let totalTime = 0;
+    if (route && routeDetails) {
+      route.poiList.forEach(poi=>{
+        totalTime += poi.estimateVisitTime;
+      });
+      routeDetails.forEach(r =>{
+        totalTime += r.duration.value/3600;
+      });
+    };
+    
+    return Math.floor(totalTime) + ' hr ' + Math.floor((totalTime - Math.floor(totalTime))*60) + ' min' ;
+
+  }
+
   return (
     <div style={{paddingLeft: 20, width: "100%"}}>
-      <Tooltip title="From" > 
+      <Tooltip title="Origin Address" > 
         <div style={{display: 'flex', justifyContent: 'space-between', alignItems:'center'}}>
           <HomeFilled /> <Input defaultValue={route?.startAddress} onChange={onChangeStartAddress}/>
         </div>
       </Tooltip>
 
       <SortList poiData={route?.poiList} removePOI={removePOI} routeInfo={routeDetails} loadSortedData={loadSortedPOI}/>
-      <Tooltip title="To" > 
+
+      <Tooltip title="Destination Address" > 
         <div style={{display: 'flex', justifyContent: 'space-between', alignItems:'center'}}>
         <HomeFilled /><Input defaultValue={route?.endAddress}  onChange={onChangeEndAddress}/>
         </div>
       </Tooltip>
 
+      {routeDetails && ( <div style={{paddingTop: '15px'}}> <h3>Total Travel & Visiting Time: {getTotalTravelTime()} </h3> </div>)}
+
       <div style={{paddingTop: 20, display: 'flex', justifyContent: 'space-between'}}>
-        <Button type="primary" onClick={()=>generateRoute(route)} width = '100' icon={<NodeIndexOutlined />}>
+        <Tooltip title ={"Generate and show current route"}>
+        <Button type="primary" onClick={()=>generateRoute(route)} width = '80' icon={<NodeIndexOutlined />} size = 'small'>
               Generate
-        </Button>   
-        <Button type="primary" onClick={()=>generateRoute(null)} width = '100' icon={<ClearOutlined />}>
+        </Button>  
+        </Tooltip> 
+
+        <Tooltip title ={"Clear current route"}>
+        <Button type="primary" onClick={()=>generateRoute(null)} width = '80' icon={<ClearOutlined />} size = 'small'>
               Clear
-        </Button>    
-        <Button type="primary" onClick={()=>showNearbyFood(route)} width = '100' icon={<img src='/food-icon.png'></img>}>
-              Nearby Food
-        </Button>   
+        </Button>  
+        </Tooltip>
+
+        <Tooltip title ={"Show Restaurant nearby current route"}>
+        <Button type="primary" onClick={()=>showNearbyFood(route)} width = '70' icon={<ImSpoonKnife />} size = 'small'>
+              <span style={{paddingLeft: '3px'}}>Food</span>
+        </Button> 
+        </Tooltip>
+        <Tooltip title ={"Show Hotel nearby current route"}>
+        <Button type="primary" onClick={()=>showNearbyHotel(route)} width = '70' icon={<MdHotel />} size = 'small'>
+              <span style={{paddingLeft: '3px'}}>Hotel</span>
+        </Button>  
+        </Tooltip>   
       </div>
       
     </div>
@@ -51,7 +86,7 @@ const RoutePOI = ({route, generateRoute, updateRoute, removePOI, routeDetails, l
 
 }
 
-const RouteDrawer = ({generateRoute, showNearbyRest, poiToTrip, routeDetails, authed}) =>{
+const RouteDrawer = ({generateRoute, showNearbyPlaces, poiToTrip, routeDetails, authed}) =>{
   const [visible, setVisible] = useState(false);
   const [loading, setLoading] = useState(false);
   const [routeExpand, setRouteExpand] = useState(false);
@@ -63,13 +98,18 @@ const RouteDrawer = ({generateRoute, showNearbyRest, poiToTrip, routeDetails, au
   useEffect(()=>{
     if (poiToTrip) {
       setRouteInfo(null);
+      generateRoute(null);
+      if (plans.length===0) {
+        message.error("Please create a plan and a route first !");
+        return;
+      }
       setPlans(plans.map(
         (plan, id)=>{
         if (activePlan !== id.toString()) return plan;
         plan.routes.map((route,rId)=>{
           if (rId === activeRoute) {
             const poiList = route.poiList;
-            const exist = poiList.find(element=>poiToTrip.poiId == element.poiId);
+            const exist = poiList.find(element=>poiToTrip.poiId === element.poiId);
             if (!exist) {
               route.poiList = [...poiList, poiToTrip];
             }
@@ -114,6 +154,7 @@ const RouteDrawer = ({generateRoute, showNearbyRest, poiToTrip, routeDetails, au
   const onCloseDrawer = () => {
       setVisible(false);
       generateRoute(null);
+      showNearbyPlaces([]);
   };
    
   const onOpenDrawer = () => {
@@ -137,10 +178,21 @@ const RouteDrawer = ({generateRoute, showNearbyRest, poiToTrip, routeDetails, au
 
   const getRouteRestaurant = (route) =>{
     setLoading(true);
-    searchNearbyRestaurant(route).then((data) => {
-      showNearbyRest(data);      
+    searchNearbyPlaces(route, 'restaurants').then((data) => {
+      showNearbyPlaces(data);      
     }).catch((err) => {
-      message.error("Fail to get restaurant");
+      message.error("Fail to get restaurant information");
+    }).finally(() => {
+      setLoading(false);
+    });
+  }
+
+  const getRouteHotel = (route) =>{
+    setLoading(true);
+    searchNearbyPlaces(route, 'hotels').then((data) => {
+      showNearbyPlaces(data);      
+    }).catch((err) => {
+      message.error("Fail to get hotel information");
     }).finally(() => {
       setLoading(false);
     });
@@ -171,7 +223,7 @@ const RouteDrawer = ({generateRoute, showNearbyRest, poiToTrip, routeDetails, au
               (plan, id)=>{
               if (activePlan !== id.toString()) return plan;
               plan.routes.map((route,rId)=>{
-                if (rId == routeSeq) {
+                if (rId === routeSeq) {
                   route.poiList = data.poiList;
                 }
                 return route;
@@ -243,6 +295,10 @@ const RouteDrawer = ({generateRoute, showNearbyRest, poiToTrip, routeDetails, au
   }
 
   const onAddNewRoute =()=>{
+    if (plans.length===0 ) {
+      message.info("Please create a plan first!");
+      return;
+    };
       setLoading(true);
       const newRoute = {
         "id": null,
@@ -403,13 +459,17 @@ const RouteDrawer = ({generateRoute, showNearbyRest, poiToTrip, routeDetails, au
     setLoading(false);
   }
   const onGeneratePlan = (data)=> {
-    console.log(data)
+    if (data.maxHours >= 24 || data.maxHours <= 0) {
+      message.info("Please input correct Hours");
+      return;
+    }
+    //console.log(data)
     generateRoute(null);
     setRouteInfo(null);
     if (activePlan) {
       generatePlan(plans[parseInt(activePlan)], data.maxHours).then((data) => {
         setPlans(plans.map((plan, id)=>{
-          if (id.toString() == activePlan) return data;
+          if (id.toString() === activePlan) return data;
           return plan;
         }));      
       }).catch((err) => {
@@ -418,7 +478,7 @@ const RouteDrawer = ({generateRoute, showNearbyRest, poiToTrip, routeDetails, au
         setLoading(false);
       });
     } else {
-      message.error("You don't select a plan");
+      message.error("You haven't selected a plan");
     }  
   }
 
@@ -441,8 +501,8 @@ const RouteDrawer = ({generateRoute, showNearbyRest, poiToTrip, routeDetails, au
   return (
     <>
       <div className ='route-position'> 
-        <Button type="primary" onClick={onOpenDrawer} size="medium">
-          Your Travel Plans
+        <Button type="primary" onClick={onOpenDrawer} size="medium" icon ={<GiJourney />}>
+          <span style={{paddingLeft: '10px'}}>Your Travel Plans</span>
         </Button>
       </div>
       <Drawer
@@ -466,8 +526,8 @@ const RouteDrawer = ({generateRoute, showNearbyRest, poiToTrip, routeDetails, au
               style={{display: 'flex', justifyContent:'space-around', alignContent: 'center'}}
             >  
             <Form.Item>
-                <Button type="primary" htmlType="submit" witdh ='100%'>
-                  Optimize Your Plan
+                <Button type="primary" htmlType="submit" witdh ='100%' icon={<GrOptimize value={{color: 'white'}}/>}>
+                  <span style={{paddingLeft: '10px'}}>Optimize Your Plan</span>
                 </Button>
               </Form.Item>
 
@@ -481,7 +541,6 @@ const RouteDrawer = ({generateRoute, showNearbyRest, poiToTrip, routeDetails, au
               </div>
 
             </Form>
-
         }
      >
        
@@ -500,18 +559,17 @@ const RouteDrawer = ({generateRoute, showNearbyRest, poiToTrip, routeDetails, au
               key={id} 
               closable={true}
               closeIcon={<DeleteButton
-                  type="primary"
-                  icon={<Tooltip title="Delete Plan"><CloseOutlined /></Tooltip>}
-                  onDelete={()=>removePlan(id)}
+                  type="text"
+                  icon={<CloseOutlined />}
+                  deleteAction={()=>removePlan(id)}
                 />}
-              style={{color: "red"}}
             >
               <div style={{display: 'flex', justifyContent:'space-between', paddingBottom: 10}}>
-              <TitleEditorModal buttonText="Rename Plan" setNewName={(newName)=>onChangePlanName(newName,id)}>
-              </TitleEditorModal>
-              <Button type="primary" onClick = {()=>onSavePlan(activePlan)} width = '80' size='small' icon={<SaveOutlined />}>
-                Save Plan
-              </Button>
+                <TitleEditorModal buttonText="Rename Plan" setNewName={(newName)=>onChangePlanName(newName,id)}>
+                </TitleEditorModal>
+                <Button type="primary" onClick = {()=>onSavePlan(activePlan)} width = '80' size='small' icon={<SaveOutlined />}>
+                  Save Plan
+                </Button>
               </div>
               
               {activePlan === id.toString() && (
@@ -527,7 +585,7 @@ const RouteDrawer = ({generateRoute, showNearbyRest, poiToTrip, routeDetails, au
                       <div>        
                       <Button
                         type="text"
-                        icon={routeExpand ? (<Tooltip title="Route details"> <MenuFoldOutlined /> </Tooltip>) : (<MenuUnfoldOutlined />)}
+                        icon={routeExpand ? (<Tooltip title="Route details"> <MenuFoldOutlined style={{color: 'blue'}}/> </Tooltip>) : (<MenuUnfoldOutlined style={{color: 'blue'}}/>)}
                         style={{fontSize: "medium", fontWeight: "bold", paddingLeft: 0}}
                         onClick={()=>toggleRouteItem(rId)}
                       >
@@ -539,9 +597,9 @@ const RouteDrawer = ({generateRoute, showNearbyRest, poiToTrip, routeDetails, au
                       </Tooltip> 
                       </div>    
                       <DeleteButton
-                        type="primary"
-                        icon={<Tooltip title="Delete Route from Plan"><DeleteOutlined /></Tooltip>}
-                        onDelete={()=>onRemoveRoute(rId)}
+                        type="text"
+                        icon={<Tooltip title="Delete Route from Plan"><DeleteFilled style={{color: 'red'}}/></Tooltip>}
+                        deleteAction={()=>onRemoveRoute(rId)}
                       />
                   </div>
                   <div className='poi-item'>
@@ -553,6 +611,7 @@ const RouteDrawer = ({generateRoute, showNearbyRest, poiToTrip, routeDetails, au
                                 routeDetails={routeInfo}
                                 loadSortedPOI={(newList)=>onChangePOIOrder(newList)}
                                 showNearbyFood={(route)=>getRouteRestaurant(route) }  
+                                showNearbyHotel = {(route)=>getRouteHotel(route)}
                                 />)}
                                             
                   </div>                    
@@ -563,7 +622,7 @@ const RouteDrawer = ({generateRoute, showNearbyRest, poiToTrip, routeDetails, au
             </Tabs.TabPane>
           ))}
         </Tabs>
-        <div style={{textAlign: 'right', width: 'inherit'}}>
+        <div style={{textAlign: 'right', width: 'inherit', paddingTop: '10px'}}>
         <Button type="primary" onClick={onAddNewRoute} width = '200' icon={<PlusOutlined />}>
           Add New Route
         </Button> 

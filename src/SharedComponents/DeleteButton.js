@@ -1,20 +1,20 @@
 import { useEffect, useState} from "react";
 import { Button, Popconfirm} from "antd";
-import {MinusSquareFilled,  MenuFoldOutlined, MenuUnfoldOutlined, SaveOutlined, QuestionCircleOutlined, PlusOutlined, PlusSquareFilled, CloseSquareFilled, NodeIndexOutlined} from "@ant-design/icons";
+import {QuestionCircleOutlined} from "@ant-design/icons";
 
 
-const DeleteButton = ({type, icon, onDelete}) => {
+const DeleteButton = ({type, icon, deleteAction}) => {
     const [visible, setVisible] = useState(false);
   
     const onConfirm=()=>{
       setVisible(false);
-      onDelete();
+      deleteAction();
     }
     const onCancel=()=>{
       setVisible(false);
     }
     return (
-      <div>
+      //<div>
         <Popconfirm title="Are you sure you want to delete？" 
                     icon={<QuestionCircleOutlined style={{ color: 'red' }} />}
                     onConfirm={onConfirm}
@@ -27,9 +27,11 @@ const DeleteButton = ({type, icon, onDelete}) => {
             type={type}
             icon={icon}
             onClick={()=>setVisible(true)}
+            size='small'
+            style={{padding: '0px', margin: '0px'}}
           />
         </Popconfirm>
-      </div>
+      //</div>
     )
   }
 

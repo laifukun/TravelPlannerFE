@@ -18,7 +18,6 @@ const TitleEditorModal = ({buttonText, setNewName}) => {
                 {buttonText}
             </Button>
             <Modal 
-                title ="Input New Name"
                 visible={visible}
                 onCancel={onClose}
                 footer={[
@@ -42,6 +41,7 @@ const TitleEditorModal = ({buttonText, setNewName}) => {
                     </Form.Item>
                     </Form>,]}
                 >
+                    <h2>Input New Name</h2>
             </Modal> 
         </>
     )

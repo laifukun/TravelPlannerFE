@@ -33,7 +33,7 @@ function LoginForm({onLoginSuccess}) {
         <Button type="primary" htmlType="submit" onClick={()=>setVisible(true)} icon={<LoginOutlined />}>
             Login
         </Button>
-        <Modal 
+        <Modal         
         visible={visible}
         onCancel={onCancel}
         footer={[
@@ -65,6 +65,7 @@ function LoginForm({onLoginSuccess}) {
             </Form.Item>
             </Form>,]}
         >
+            <h2>Login</h2>
         </Modal>
         </>
     );

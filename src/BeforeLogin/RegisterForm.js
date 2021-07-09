@@ -87,6 +87,7 @@ const RegistrationForm = ({onSuccess}) => {
 
         </Form>,]}
             >
+                <h2>Register</h2>
         </Modal>
         </>
     )

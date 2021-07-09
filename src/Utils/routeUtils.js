@@ -94,7 +94,7 @@ export const deleteRoute = (routeId) => {
       body: JSON.stringify(data),
       credentials: "include",
     }).then((response) => {
-      if (response.status !== 201) {
+      if (response.status !== 200) {
         throw Error("Fail to save plan");
       }
       return response.json();

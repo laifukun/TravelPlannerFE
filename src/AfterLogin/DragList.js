@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { StarFilled, HomeFilled, MinusOutlined} from "@ant-design/icons";
-import {Collapse, Button, Tooltip} from "antd"
+import { StarFilled, MinusOutlined} from "@ant-design/icons";
+import { Button, Tooltip} from "antd"
 import {
   sortableContainer,
   sortableElement,
@@ -9,9 +9,9 @@ import {
 import arrayMove from "array-move";
 import '../styles/RouteDrawer.css';
 import DeleteButton from "../SharedComponents/DeleteButton";
-const { Panel } = Collapse;
 
-const DragHandle = sortableHandle(({value}) => <Button type='text' icon ={<StarFilled/>} style={{padding: 0, cursor: 'move'}}
+
+const DragHandle = sortableHandle(({value}) => <Button type='text' icon ={<StarFilled style={{color: 'green'}}/>} style={{padding: 0, cursor: 'move'}}
 >{value}</Button>);
 
 const SortableItem = sortableElement(({ poi }) => (
@@ -70,9 +70,9 @@ export default function SortList({poiData, removePOI, routeInfo, loadSortedData}
           <div className='poi-item'> 
             <SortableItem key={`item-${index}`} index={index} poi={poi} />
             <DeleteButton
-              type="primary"
-              icon={<Tooltip title="Delete POI from Route"><MinusOutlined /></Tooltip>}
-              onDelete={()=>removePOI(index)}
+              type="secondary"
+              icon={<Tooltip title="Delete POI from Route"><MinusOutlined style={{color: 'red'}}/></Tooltip>}
+              deleteAction={()=>removePOI(index)}
             />
           </div>
           <div className="route-info">                    

@@ -16,8 +16,8 @@ export const searchByKeyword = (keyword) => {
     });
   };
 
-  export const searchNearbyRestaurant = (route) => {
-    return fetch(`/search/route/restaurants`, {
+  export const searchNearbyPlaces = (route, placeType) => {
+    return fetch(`/search/route/${placeType}`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -26,7 +26,7 @@ export const searchByKeyword = (keyword) => {
       credentials: "include",
     }).then((response) => {
       if (response.status !== 200) {
-        throw Error("Fail to get restaurant");
+        throw Error("Fail to get places");
       }
       return response.json();
     });
