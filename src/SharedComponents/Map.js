@@ -253,7 +253,8 @@ function Map({initCenter, searchData, pickedPOI, routePoints, addPOItoRoute, loa
                              />
                              <div className="card-button">
                              
-                             <Card title ={(<div>{selectedPOI.name} <Rate disabled allowHalf value={selectedPOI.popularity / 2} /></div>)} 
+                             <Card title ={(<div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
+                                 {selectedPOI.name} <Rate disabled allowHalf value={selectedPOI.popularity / 2} /></div>)} 
                              bodyStyle={{paddingTop: 0, paddingBottom: 0}}>
                                 {selectedPOI.description}                                
                              </Card>
