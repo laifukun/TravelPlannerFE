@@ -94,10 +94,8 @@ function Main(props) {
         <Layout style={{display: "flex", justifyContent: "space-between", height: "100vh" }}>
 
             <Header style={{paddingLeft: 0, paddingRight: 0}}>
-                <div className="header">
-                    <div className="title">
-                    Travel Planner
-                    </div>
+                <div className="header">                  
+                        <img src='/logo1.png'></img>
                     <>
                         {authed ? ( <div className="welcome"> 
                                         <div>Welcome <strong> {`${user.firstName}`} </strong> ! </div> 
