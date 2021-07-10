@@ -11,7 +11,7 @@ import Map from './Map';
 import { getUserInfo } from "../Utils/userUtils";
 import { getRouteDetailsById } from "../Utils/routeUtils";
 import RouteDrawer from '../AfterLogin/RouteDrawer';
-
+import logo from './logo.png';
 
 const { Header, Content, Footer} = Layout;
 
@@ -94,8 +94,13 @@ function Main(props) {
         <Layout style={{display: "flex", justifyContent: "space-between", height: "100vh" }}>
 
             <Header style={{paddingLeft: 0, paddingRight: 0}}>
-                <div className="header">                  
-                        <img src='/logo1.png'></img>
+                <div className="header">    
+                    <div style= {{display : "flex"}}>
+                        <img src= {logo} height = '60'></img>
+                            <h1 className="title">
+                                Lai Travel
+                            </h1>
+                    </div>                    
                     <>
                         {authed ? ( <div className="welcome"> 
                                         <div>Welcome <strong> {`${user.firstName}`} </strong> ! </div> 
