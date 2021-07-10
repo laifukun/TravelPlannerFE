@@ -6,7 +6,6 @@ import {searchByRange} from '../Utils/searchUtils';
 import "../styles/Map.css"
 import { Button, Image, Card, message, Rate } from "antd";
 import {haversine_distance} from '../Utils/others'
-import { CoffeeOutlined } from "@ant-design/icons";
 import {ImSpoonKnife} from 'react-icons/im'
 import foodIcon from "../asset/food-icon2.png"
 

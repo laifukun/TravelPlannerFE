@@ -501,7 +501,7 @@ const RouteDrawer = ({generateRoute, showNearbyPlaces, poiToTrip, routeDetails, 
   return (
     <>
       <div className ='route-position'> 
-        <Button type="primary" onClick={onOpenDrawer} size="medium" icon ={<GiJourney />}>
+        <Button type="primary" onClick={onOpenDrawer} size="medium" icon ={<GiJourney /> } shape="round" style={{backgroundColor: '#1E8449', border: 'none'}}>
           <span style={{paddingLeft: '10px'}}>Your Travel Plans</span>
         </Button>
       </div>

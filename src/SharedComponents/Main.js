@@ -1,6 +1,5 @@
 import React, { Component } from "react";
 import {Layout, Button, message, Modal} from "antd";
-import POIInstruction from  './POIInstruction';
 import LoginForm from "../BeforeLogin/LoginForm";
 import RegisterForm from "../BeforeLogin/RegisterForm";
 import Logout from "../AfterLogin/LogOut"
