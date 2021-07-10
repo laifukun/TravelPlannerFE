@@ -94,11 +94,12 @@ function Main(props) {
 
             <Header style={{paddingLeft: 0, paddingRight: 0}}>
                 <div className="header">    
-                    <div style= {{display : "flex"}}>
-                        <img src= {logo} height = '60'></img>
-                            <h1 className="title">
-                                Lai Travel
-                            </h1>
+                    <div style={{display: 'flex', justifyContent: "left", padding: 0}}>
+                    
+                        <div><img src= {logo} height = '60px'></img></div>
+                        <div className="title" >
+                            <p style={{position: "absolute", width: "150px", marginBottom: '-15px', bottom: '0'}}>Lai Travel</p>    
+                        </div>
                     </div>                    
                     <>
                         {authed ? ( <div className="welcome"> 
@@ -141,18 +142,18 @@ function Main(props) {
             </div>
         </ Content>
 
-        <Footer className="footer" style = {{paddingLeft: 100, paddingRight: 0}}>
-                <div>©2021 Travel Planner. All Rights Reserved. Developed by FLAG Team 2</div>
-                <div style = {{backgroundColor: "#282c34", width: "30%", display: 'flex' }}>
+        <Footer className="footer" style = {{paddingLeft: 100, paddingRight: 0, color: 'rgb(2, 2, 2)'}}>
+                <div style={{color: 'rgb(2, 2, 2)'}}>©2021 Travel Planner. All Rights Reserved. Developed by FLAG Team 2</div>
+                <div style = {{backgroundColor: "inherit", width: "30%", display: 'flex' }}>
                     <span style = {{ textAlign: "center"}}> Contact us: laiTeam2@gmail.com </span>
                     <span>
-                    <Button type="primary" size='small'  onClick={() => showModal("stat") } style = {{ backgroundColor: "#282c34", border: "none"}}>Privacy Statement</Button>
+                    <Button type="primary" size='small'  onClick={() => showModal("stat") } style = {{ backgroundColor: "inherit", border: "none", color:'rgb(2, 2, 2)' }}>Privacy Statement</Button>
                     <Modal title="Privacy Statement" visible={isStatVisible} onOk={() => handleOk("stat")} onCancel={() => handleCancel("stat")} style = {{width: "50%"}}>
                     This Privacy Policy explains how TravelPlanner ( “we”or “us”) collects, uses, and discloses information about you. This Privacy Policy applies when you use our websites, mobile applications, and other online products and services that link to this Privacy Policy (collectively, our “Services”), contact our customer service team, engage with us on social media, or otherwise interact with us.
                     We may change this Privacy Policy from time to time. If we make changes, we will notify you by revising the date at the top of this policy and, in some cases, we may provide you with additional notice (such as adding a statement to our website or providing you with a notification). We encourage you to review this Privacy Policy regularly to stay informed about our information practices and the choices available to you.
                     </Modal>
                 
-                    <Button title = "Team" type="primary" size='small' onClick={() => showModal("staff")} style = {{ backgroundColor: "#282c34", border: "none"}}>Team</Button>
+                    <Button title = "Team" type="primary" size='small' onClick={() => showModal("staff")} style = {{ backgroundColor: "inherit", border: "none", color:'rgb(2, 2, 2)'}}>Team</Button>
                     <Modal title = "Team" visible={isStaffVisible} onOk={() => handleOk("staff")} onCancel={() => handleCancel("staff")} style = {{width: "50%"}}>
                     Fukun Lai;
                     Zheng Xie;
@@ -163,7 +164,7 @@ function Main(props) {
                     Songjian Li
                     </Modal>
                     
-                    <Button type="primary" size='small' onClick={() => showModal("about")} style = {{ backgroundColor: "#282c34", border: "none"}}>About Us</Button>
+                    <Button type="primary" size='small' onClick={() => showModal("about")} style = {{ backgroundColor: "inherit", border: "none", color:'rgb(2, 2, 2)'}}>About Us</Button>
                     <Modal title = "About us"  visible={isModalVisible} onOk={() => handleOk("about")} onCancel={() => handleCancel("about")} style = {{width: "50%"}}>
                     Most often, people have some rough ideas of the locations/attractions they want to visit, but they normally have no clear idea how to plan their trip to best suit their schedule and interest. The intent of a travel planner is to provide a tool to fill this gap. Users are able to arrange and plan their trip with travel planner according to their schedule and interest.
                     </Modal>

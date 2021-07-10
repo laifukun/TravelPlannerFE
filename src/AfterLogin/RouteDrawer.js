@@ -58,24 +58,28 @@ const RoutePOI = ({route, generateRoute, updateRoute, removePOI, routeDetails, l
 
       <div style={{paddingTop: 20, display: 'flex', justifyContent: 'space-between'}}>
         <Tooltip title ={"Generate and show current route"}>
-        <Button type="primary" onClick={()=>generateRoute(route)} width = '80' icon={<NodeIndexOutlined />} size = 'small'>
+        <Button type="primary" onClick={()=>generateRoute(route)} width = '80' icon={<NodeIndexOutlined />} size = 'small' 
+        style={{backgroundColor: '#884EA0', border: 'none'}}>
               Generate
         </Button>  
         </Tooltip> 
 
         <Tooltip title ={"Clear current route"}>
-        <Button type="primary" onClick={()=>generateRoute(null)} width = '80' icon={<ClearOutlined />} size = 'small'>
+        <Button type="primary" onClick={()=>generateRoute(null)} width = '80' icon={<ClearOutlined />} size = 'small' 
+        style={{backgroundColor: '#117A65', border: 'none'}}>
               Clear
         </Button>  
         </Tooltip>
 
         <Tooltip title ={"Show Restaurant nearby current route"}>
-        <Button type="primary" onClick={()=>showNearbyFood(route)} width = '70' icon={<ImSpoonKnife />} size = 'small'>
+        <Button type="primary" onClick={()=>showNearbyFood(route)} width = '70' icon={<ImSpoonKnife />} size = 'small' 
+        style={{backgroundColor: '#129EAF', border: 'none'}}>
               <span style={{paddingLeft: '3px'}}>Food</span>
         </Button> 
         </Tooltip>
         <Tooltip title ={"Show Hotel nearby current route"}>
-        <Button type="primary" onClick={()=>showNearbyHotel(route)} width = '70' icon={<MdHotel />} size = 'small'>
+        <Button type="primary" onClick={()=>showNearbyHotel(route)} width = '70' icon={<MdHotel />} size = 'small' 
+        style={{backgroundColor: '#F39C12', border: 'none'}}>
               <span style={{paddingLeft: '3px'}}>Hotel</span>
         </Button>  
         </Tooltip>   
@@ -526,7 +530,8 @@ const RouteDrawer = ({generateRoute, showNearbyPlaces, poiToTrip, routeDetails, 
               style={{display: 'flex', justifyContent:'space-around', alignContent: 'center'}}
             >  
             <Form.Item>
-                <Button type="primary" htmlType="submit" witdh ='100%' icon={<GrOptimize value={{color: 'white'}}/>}>
+                <Button type="primary" htmlType="submit" witdh ='100%' icon={<GrOptimize value={{color: 'white'}}/>}
+                shape='round' style={{backgroundColor: '#27AE60', border: 'none'}}>
                   <span style={{paddingLeft: '10px'}}>Optimize Your Plan</span>
                 </Button>
               </Form.Item>
@@ -623,7 +628,8 @@ const RouteDrawer = ({generateRoute, showNearbyPlaces, poiToTrip, routeDetails, 
           ))}
         </Tabs>
         <div style={{textAlign: 'right', width: 'inherit', paddingTop: '10px'}}>
-        <Button type="primary" onClick={onAddNewRoute} width = '200' icon={<PlusOutlined />}>
+        <Button type="primary" onClick={onAddNewRoute} width = '200' icon={<PlusOutlined />} shape='round'
+        sytle={{border: 'none', }}>
           Add New Route
         </Button> 
         </div>
